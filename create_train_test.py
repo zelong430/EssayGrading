@@ -31,8 +31,8 @@ def main():
     test = pd.concat(test)
 
     train.to_csv('train.tsv', sep='\t', index = False)
-    val.to_csv('val.tsv', sep='\t')
-    test.to_csv('test.tsv', sep='\t')
+    val.to_csv('val.tsv', sep='\t', index = False)
+    test.to_csv('test.tsv', sep='\t', index = False)
 
 
 if __name__ == "__main__":
