@@ -21,7 +21,7 @@ def main():
     train = []
     val = []
     test = []
-    for i in range(9):
+    for i in range(1, 9):
         a,b,c = split_train_test(data, i, size = 0.8)
         train.append(a)
         val.append(b)
@@ -30,9 +30,9 @@ def main():
     val = pd.concat(val)
     test = pd.concat(test)
 
-    train.to_csv('train.tsv', sep='\t', index = False)
-    val.to_csv('val.tsv', sep='\t', index = False)
-    test.to_csv('test.tsv', sep='\t', index = False)
+    train.to_csv('processed_data/train.tsv', sep='\t', index = False)
+    val.to_csv('processed_data/val.tsv', sep='\t', index = False)
+    test.to_csv('processed_data/test.tsv', sep='\t', index = False)
 
 
 if __name__ == "__main__":
