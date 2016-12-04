@@ -28,8 +28,8 @@ def clean_data(text, keep_period = False):
     return text
 
 word2emb = word2vec.Word2Vec.load_word2vec_format('text8-vector.bin', binary=True)
-docset = {i+1:[] for i in range(8)}
 for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
+    docset = {i + 1: [] for i in range(8)}
     with open(file) as f:
         skip = 1
         for line in f.readlines():
@@ -38,24 +38,21 @@ for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
                 continue
             # word_list += clean_data(line.rstrip().split('\t')[2]).split()
             fields = line.rstrip().split('\t')
-            if int(fields[1]) > 8:
-                print file
-                print line.rstrip()
-            idset.add(int(fields[1]))
-            # sentence_list = clean_data(fields[2], True).split('.')
-            # cur_doc = []
-            # for sentence in sentence_list:
-            #     sentence_emb = np.zeros(200)
-            #     store = 0
-            #     for word in sentence.split():
-            #         try:
-            #             sentence_emb += word2emb[word]
-            #             store = 1
-            #         except:
-            #             pass
-            #     if store == 1:
-            #         cur_doc.append(sentence_emb)
-            # docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
-        # for id in idset: print id
-    # with open(sfile, 'wb') as g:
-    #     pickle.dump(docset, g)
+            sentence_list = clean_data(fields[2], True).split('.')
+            cur_doc = []
+            for sentence in sentence_list:
+                sentence_emb = np.zeros(200)
+                store = 0
+                for word in sentence.split():
+                    try:
+                        sentence_emb += word2emb[word]
+                        store = 1
+                    except:
+                        pass
+                if store == 1:
+                    cur_doc.append(sentence_emb)
+
+            docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
+
+    with open(sfile, 'wb') as g:
+        pickle.dump(docset, g)
