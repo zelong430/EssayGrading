@@ -1,5 +1,9 @@
 import re
-datafiles = ['../processed_data/train.tsv','../processed_data/val.tsv',
+import pickle
+import numpy as np
+from gensim.models import word2vec
+
+datafiles = ['../processed_data/train.tsv', '../processed_data/val.tsv',
             '../processed_data/test.tsv']
 '''
 Schema:
@@ -23,18 +27,35 @@ def clean_data(text, keep_period = False):
         text = re.sub('[^a-zA-Z0-9@]', ' ', text)
     return text
 
-word_list = []
-for file in datafiles:
+word2emb = word2vec.Word2Vec.load_word2vec_format('text8-vector.bin', binary=True)
+docset = {i+1:[] for i in range(8)}
+for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
     with open(file) as f:
+        skip = 1
         for line in f.readlines():
-            # essay = NER_pat.sub('\\1', line.rstrip().split('\t')[2])
-            # essay = NUM_pat.sub('NUMBER', essay)
-            # word_list += re.split('\W', essay.lower())
-            # word_list += essay.lower().split()
-            word_list += clean_data(line.rstrip().split('\t')[2]).split()
-
-words = sorted(list(set(word_list)))
-for word in words: print(word)
-print('total words:', len(words))
-word2idx = dict((w, i) for i, w in enumerate(words))
-idx2word = dict((i, w) for i, w in enumerate(words))
+            if skip == 1:
+                skip = 0
+                continue
+            # word_list += clean_data(line.rstrip().split('\t')[2]).split()
+            fields = line.rstrip().split('\t')
+            if int(fields[1]) > 8:
+                print file
+                print line.rstrip()
+            idset.add(int(fields[1]))
+            # sentence_list = clean_data(fields[2], True).split('.')
+            # cur_doc = []
+            # for sentence in sentence_list:
+            #     sentence_emb = np.zeros(200)
+            #     store = 0
+            #     for word in sentence.split():
+            #         try:
+            #             sentence_emb += word2emb[word]
+            #             store = 1
+            #         except:
+            #             pass
+            #     if store == 1:
+            #         cur_doc.append(sentence_emb)
+            # docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
+        # for id in idset: print id
+    # with open(sfile, 'wb') as g:
+    #     pickle.dump(docset, g)
