@@ -55,17 +55,20 @@ def evaluate(pred_y, true_y = None, against = None):
 	assert ((true_y is not None) or (against is not None))
 	if against is not None:
 		true_y = read_label(against)
-	print true_y
 	if pred_y.dtype != 'int64' or true_y.dtype != 'int64':
 		raise ValueError("The two numpy arrays must be numpy array with data type int64")
 	if np.all(pred_y[:,0] == true_y[:,0]) != True or np.all(pred_y[:,1] == true_y[:,1]) != True:
 		raise ValueError('The first two columns of pred_y and true_y must match, please check the essay_id and essay_set id')
-	list_grade = np.zeros(8)
+	list_kappa = np.zeros(8)
 	for i in range(1, 9):
-		list_grade[i-1] = quadratic_weighted_kappa(pred_y[pred_y[:,0] == i, 2], true_y[true_y[:,0] == i, 2],\
+		list_kappa[i-1] = quadratic_weighted_kappa(pred_y[pred_y[:,0] == i, 2], true_y[true_y[:,0] == i, 2],\
 													min_rating=set_range[i][0], max_rating=set_range[i][1]
 													)
-	print list_grade 
+	list_kappa[list_kappa > 0.999] = 0.999
+	z = 0.5 * np.log((1 + list_kappa)/(1 - list_kappa))	
+	z = z.mean()
+	averaged_kappa = (np.exp(2*z) - 1)/(np.exp(2*z) + 1)
+	return averaged_kappa
 
 def read_label(file):
 	if file == 0:
