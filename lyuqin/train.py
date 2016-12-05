@@ -9,7 +9,6 @@ sentemb = 64
 docemb = 128
 train_data = pickle.load(open("train.pkl", 'rb'))
 
-
 def make_pair(X, maxlen=20, maxsample = 10000):
     X = sorted(X, key = lambda x: x[1], reverse=True)
     Xleft, Xright = [], []
@@ -27,17 +26,22 @@ def make_pair(X, maxlen=20, maxsample = 10000):
                 else:
                     Xright.append(X[j][0][:maxlen])
                 cnt += 1
-            if cnt >= maxsample: break
-        if cnt >= maxsample: break
+            if maxsample != -1 and cnt >= maxsample: break
+        if maxsample != -1 and cnt >= maxsample: break
     return Xleft, Xright
 
 
 Xleft, Xright = [], []
+Xvalleft, Xvalright = [], []
 
 for setid in range(1, 9, 1):
     l, r = make_pair(train_data[setid])
     Xleft += l
     Xright += r
+
+    # l, r = make_pair(val_data[setid])
+    # Xvalleft += l
+    # Xright += r
 
 nsample = len(Xleft)
 seqlen = Xleft[0].shape[0]
@@ -46,7 +50,8 @@ Xleft = np.reshape(Xleft, (nsample, seqlen, embsize))
 Xright = np.reshape(Xright, (nsample, seqlen, embsize))
 y = np.zeros((nsample, 2))
 y[:, 0] = 1
-
+# yval = np.zeros((len(Xvalleft), 2))
+# yval[:, 0] = 1
 
 xl = Input(shape=(seqlen, embsize))
 xr = Input(shape=(seqlen, embsize))
@@ -66,5 +71,8 @@ model = Model(input=[xl, xr], output=predictions)
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
-model.fit([Xleft, Xright], y, nb_epoch=10)
+model.fit([Xleft, Xright], y, nb_epoch=2)
+# model.fit([Xleft, Xright], y, nb_epoch=10, validation_data=([Xvalleft,Xvalright], yval))
+
+model.save('bow_lstm.h5')
 model.save_weights("bow-lstm.w")
