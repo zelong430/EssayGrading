@@ -51,8 +51,10 @@ for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
                         pass
                 if store == 1:
                     cur_doc.append(sentence_emb)
-
-            docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
+            if sfile == 'test.pkl':
+                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1]), int(fields[0])))
+            else:
+                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
 
     with open(sfile, 'wb') as g:
         pickle.dump(docset, g)

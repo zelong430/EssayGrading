@@ -4,12 +4,9 @@ from keras.layers import Input, LSTM, Dense, merge
 from keras.models import Model
 from keras.layers.core import Activation
 
-wordemb = 32
-sentemb = 64
-docemb = 128
 train_data = pickle.load(open("train.pkl", 'rb'))
 
-def make_pair(X, maxlen=20, maxsample = 10000):
+def make_pair(X, maxlen=10, maxsample = 1000):
     X = sorted(X, key = lambda x: x[1], reverse=True)
     Xleft, Xright = [], []
     cnt = 0
@@ -55,9 +52,14 @@ y[:, 0] = 1
 
 xl = Input(shape=(seqlen, embsize))
 xr = Input(shape=(seqlen, embsize))
-shared_lstm = LSTM(1)
-scorel = shared_lstm(xl)
-scorer = shared_lstm(xr)
+shared_lstm = LSTM(output_dim=64, return_sequences=False)
+scorefun = Dense(output_dim=1, activation='sigmoid')
+hidl = shared_lstm(xl)
+scorel = scorefun(hidl)
+hidr = shared_lstm(xr)
+scorer = scorefun(hidr)
+# scorel = scorefun(xl)
+# scorer = scorefun(xr)
 
 merged_vector = merge([scorel, scorer], mode='concat', concat_axis=-1)
 predictions = Activation('softmax')(merged_vector)
@@ -68,8 +70,8 @@ predictions = Activation('softmax')(merged_vector)
 # tweet inputs to the predictions
 model = Model(input=[xl, xr], output=predictions)
 
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
+model.compile(optimizer='adadelta',
+              loss='categorical_crossentropy',
               metrics=['accuracy'])
 model.fit([Xleft, Xright], y, nb_epoch=2)
 # model.fit([Xleft, Xright], y, nb_epoch=10, validation_data=([Xvalleft,Xvalright], yval))
