@@ -1,11 +1,11 @@
 import pickle
 import numpy as np
 from keras.layers import Input, LSTM, Dense, merge
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras.layers.core import Activation
 from keras.models import load_model
 
-maxlen = 10
+maxlen = 30
 
 # xl = Input(shape=(20, 200))
 # shared_lstm = LSTM(output_dim=64, return_sequences=False)
@@ -14,6 +14,8 @@ maxlen = 10
 # scorel = scorefun(hidl)
 # model = Model(input=xl, output=scorel)
 # model.load_weights('bow_lstm.h5')
+
+score_model = load_model('score_model.h5')
 
 model = load_model('bow_lstm.h5')
 test_data = pickle.load(open("test.pkl", 'rb'))
@@ -53,14 +55,17 @@ for setid in range(1, 9, 1):
 Xleft = np.reshape(Xleft, (len(Xleft), Xleft[0].shape[0], Xleft[0].shape[1]))
 Xright = np.reshape(Xright, (len(Xright), Xright[0].shape[0], Xright[0].shape[1]))
 
+
+
+# y = score_model.predict(Xleft)
+# for tmp in y: print tmp[0]
+
 y = model.predict([Xleft, Xright])
 cnt = 0
 right = 0
 for tmp in y:
-    if tmp[0] > tmp[1]:
+    print tmp[0]
+    if tmp[0] > 0.5:
         right += 1
     cnt += 1
 print right, cnt, right*1.0/cnt
-# for i in range(len(result)):
-#     result[i][2] = y[i][0]
-# for r in result: print r

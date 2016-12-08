@@ -27,7 +27,16 @@ def clean_data(text, keep_period = False):
         text = re.sub('[^a-zA-Z0-9@]', ' ', text)
     return text
 
-word2emb = word2vec.Word2Vec.load_word2vec_format('text8-vector.bin', binary=True)
+# word2emb = word2vec.Word2Vec.load_word2vec_format('text8-vector.bin', binary=True)
+f = open('glove.840B.300d.txt', 'r')
+word2emb = {}
+for line in f.readlines():
+    fields = line.rstrip().split()
+    emb = np.fromstring(' '.join(fields[1:]), dtype=float, sep=' ')
+    word2emb[fields[0]] = emb
+embsize = 300
+
+
 for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
     docset = {i + 1: [] for i in range(8)}
     with open(file) as f:
@@ -41,7 +50,7 @@ for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
             sentence_list = clean_data(fields[2], True).split('.')
             cur_doc = []
             for sentence in sentence_list:
-                sentence_emb = np.zeros(200)
+                sentence_emb = np.zeros(embsize)
                 store = 0
                 for word in sentence.split():
                     try:
@@ -52,9 +61,9 @@ for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
                 if store == 1:
                     cur_doc.append(sentence_emb)
             if sfile == 'test.pkl':
-                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1]), int(fields[0])))
+                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), embsize)), int(fields[-1]), int(fields[0])))
             else:
-                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), 200)), int(fields[-1])))
+                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), embsize)), int(fields[-1])))
 
     with open(sfile, 'wb') as g:
         pickle.dump(docset, g)
