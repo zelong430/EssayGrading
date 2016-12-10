@@ -1,4 +1,4 @@
-import pickle
+import cPickle
 import numpy as np
 from keras.layers import Input, LSTM, Dense, merge, GRU
 from keras.models import Model, Sequential
@@ -8,11 +8,11 @@ from keras.layers.pooling import MaxPooling1D, AveragePooling1D
 from keras.layers.core import Flatten
 from keras.layers import Merge
 
-val_data = pickle.load(open("val.pkl", 'rb'))
+val_data = cPickle.load(open("val.pkl", 'rb'))
 
-train_data = pickle.load(open("train.pkl", 'rb'))
+train_data = cPickle.load(open("train.pkl", 'rb'))
 
-def make_pair(X, maxlen=30, maxsample = 5000):
+def make_pair(X, maxlen=30, maxsample = 3000):
     X = sorted(X, key = lambda x: x[1], reverse=True)
     Xleft, Xright = [], []
     cnt = 0
@@ -64,10 +64,10 @@ yval = np.ones((len(Xvalleft), 1))
 score_model = Sequential()
 # score_model.add(LSTM(output_dim=64, return_sequences=False, input_shape=(30, embsize)))
 score_model.add(Convolution1D(64, 5, border_mode='same', input_shape=(30, embsize)))
-score_model.add(MaxPooling1D(pool_length=30, stride=None, border_mode='valid'))
-# score_model.add(AveragePooling1D(pool_length=30, stride=None, border_mode='valid'))
+# score_model.add(MaxPooling1D(pool_length=30, stride=None, border_mode='valid'))
+score_model.add(AveragePooling1D(pool_length=30, stride=None, border_mode='valid'))
 score_model.add(Flatten())
-# score_model.add(Dense(1, activation='relu'))
+score_model.add(Dense(1))
 
 xl = Input(shape=(30, embsize))
 xr = Input(shape=(30, embsize))
