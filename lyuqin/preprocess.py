@@ -1,5 +1,6 @@
 import re
-import pickle
+import cPickle
+import os
 import numpy as np
 from gensim.models import word2vec
 
@@ -27,17 +28,37 @@ def clean_data(text, keep_period = False):
         text = re.sub('[^a-zA-Z0-9@]', ' ', text)
     return text
 
+word_list = []
+for file in datafiles:
+    with open(file) as f:
+        skip = 1
+        for line in f.readlines():
+            if skip == 1:
+                skip = 0
+                continue
+            fields = line.rstrip().split('\t')
+            tmp = clean_data(fields[2], False).split()
+            word_list += tmp
+word_list = set(word_list)
+
 # word2emb = word2vec.Word2Vec.load_word2vec_format('text8-vector.bin', binary=True)
-f = open('glove.840B.300d.txt', 'r')
-word2emb = {}
-for line in f.readlines():
-    fields = line.rstrip().split()
-    emb = np.fromstring(' '.join(fields[1:]), dtype=float, sep=' ')
-    word2emb[fields[0]] = emb
+if os.path.exists('./word2emb.pkl'):
+    with open('./word2emb.pkl', 'rb') as f:
+        word2emb = cPickle.load(f)
+else:
+    word2emb = {}
+    with open('glove.840B.300d.txt', 'r') as f:
+        for line in f.readlines():
+            fields = line.rstrip().split()
+            if fields[0] in word_list:
+                emb = np.fromstring(' '.join(fields[1:]), dtype=float, sep=' ')
+                word2emb[fields[0]] = emb
+    with open('./word2emb.pkl', 'wb') as f:
+        cPickle.dump(word2emb, f)
+
 embsize = 300
 
-
-for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
+for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl']):
     docset = {i + 1: [] for i in range(8)}
     with open(file) as f:
         skip = 1
@@ -60,10 +81,7 @@ for file, sfile in zip(datafiles, ['train.pkl', 'val.pkl', 'test.pkl']):
                         pass
                 if store == 1:
                     cur_doc.append(sentence_emb)
-            if sfile == 'test.pkl':
-                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), embsize)), int(fields[-1]), int(fields[0])))
-            else:
-                docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), embsize)), int(fields[-1])))
+            docset[int(fields[1])].append((np.reshape(cur_doc, (len(cur_doc), embsize)), int(fields[-1])))
 
     with open(sfile, 'wb') as g:
-        pickle.dump(docset, g)
+        cPickle.dump(docset, g)

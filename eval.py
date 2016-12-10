@@ -29,7 +29,7 @@ def ranking(pred_file, ndcg_num = -1):
     with open(pred_file, 'r') as f:
         for line in f.readlines():
             fields = line.rstrip().split(',')
-            score_pairs[int(fields[0])].append((int(fields[2]), int(fields[3])))
+            score_pairs[int(fields[0])].append((float(fields[2]), float(fields[3])))
     avgNDCG = 0.0
     cnt = 0
     for i in range(1, 9):
@@ -44,14 +44,17 @@ def ranking(pred_file, ndcg_num = -1):
         sp.sort(key=lambda x:x[0], reverse=True)
         DCG = 0.0
         for k in range(n):
-            DCG += sp[k][1]/np.log2(k+2)
+            # DCG += sp[k][1]/np.log2(k+2)
+            DCG += np.exp2(sp[k][1]) / np.log2(k + 2)
 
         sp.sort(key=lambda x:x[1], reverse=True)
         IDCG = 0.0
         for k in range(n):
-            IDCG += sp[k][1]/np.log2(k+2)
+            # IDCG += sp[k][1]/np.log2(k+2)
+            IDCG += np.exp2(sp[k][1]) / np.log2(k + 2)
 
         avgNDCG += DCG/IDCG
+        print '  {0}th class NDCG: {1}'.format(i, DCG/IDCG)
 
     return avgNDCG/cnt
 
@@ -79,12 +82,12 @@ def evaluate(pred_file):
     with open(pred_file, "r") as f:
         reader = csv.reader(f, delimiter=",")
         for line in reader:
-            pred.append(int(line[2]))
-            actual.append(int(line[3]))
+            pred.append(int(float(line[2])))
+            actual.append(int(float(line[3])))
 
     print("Classification Accuracy: {}".format(accuracy(pred, actual)))
     print("MSE: {}".format(mse(pred, actual)))
-    print("Ranking: {}".format(ranking(pred_file)))
+    print("Average NDCG: {}".format(ranking(pred_file)))
 
     return True
 
