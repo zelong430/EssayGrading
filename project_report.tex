@@ -151,6 +151,19 @@ $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 		Char-level CNN (6-layer, embed) & & & & \\
 	\end{tabular}
 	\caption{Performance on test set evaluated via the metrics discussed above.}
+	\label{fig:eval}
+\end{table}
+
+\begin{table}
+	\begin{tabular}{c|c|c|c|c|c}
+		Model & Embed Dim. & Filter Sizes & Num. Filters & Pooling & Hidden Dim. \\\hline
+		Char-level CNN (1-layer, one-hot) & -- & 64 & 64 & 64 & 32 \\
+		Char-level CNN (1-layer, embed) &  & & & & \\
+		Char-level CNN (6-layer, one-hot) & -- & & & & \\
+		Char-level CNN (6-layer, embed) & & & & & \\
+	\end{tabular}
+	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
+	\label{fig:params}
 \end{table}
 
 \section*{Discussion}
@@ -159,7 +172,7 @@ $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 
 \subsection*{Won Lee}
 
-Prior to the switch in our project from music-to-lyric generation to automated essay grading, I conducted all data generation (i.e. cleaning, formatting, compiling music-lyric pairs, etc.) and finalized models and training for training/evaluation on Harvard's clusters. With regard to essay grading, I developed all of the character-level models and conducted exhaustive grid search and training for these models. I also contributed to the evaluation script as well as various data-related auxiliary scripts for loading onto the models. Finally, I did most of the write-up for the current report as well as the proposal.
+Prior to the switch in our project from music-to-lyric generation to automated essay grading, I conducted all data generation (i.e. cleaning, formatting, compiling music-lyric pairs, etc.) and finalized models and training for training/evaluation on Harvard's clusters. With regard to essay grading, I developed all of the character-level and CNN-based models and conducted exhaustive grid search and training for these models. I also contributed to the evaluation script as well as various data-related auxiliary scripts for loading onto the models. Finally, I did most of the write-up for the current report as well as the proposal.
 
 \subsection*{Qin Lyu}
 
