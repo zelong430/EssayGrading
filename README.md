@@ -36,4 +36,4 @@ where the `pred_file` is the name of the file containing the above output. The e
 
 * Classification accuracy: Raw classification rate, treating each score as a separate category.
 * MSE: Mean-squared error of the predictions (across all essay sets).
-* Ranking:
+* NDCG: [The Normalized Discounted Cumulative Gain](https://en.wikipedia.org/wiki/Discounted_cumulative_gain).

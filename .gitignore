@@ -1,0 +1,4 @@
+*.txt
+*.pkl
+*.csv
+gensim
