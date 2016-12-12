@@ -136,7 +136,17 @@ One issue with a raw classification accuracy metric is that it does not provide 
 Thus, we consider the traditional mean-squared error (MSE) as one of our metrics, namely:
 $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 
-\subsection*{Discounted Cumulative Gain (nDCG)}
+\subsection*{Normalized Discounted Cumulative Gain (NDCG)}
+
+In addition to the classification accuracy and MSE, we also report NDCG to measure the ranking quality of a model. In our problem, each essay has a discrete score that can be compared with the scores of other essays in the same essay set, while scores of essays from different essay sets are not comparable since the score range of essay sets are different. For each essay set, we compute the Discounted Cumulative Gain (DCG):
+ 
+$$DCG=\sum_{i=1}^n\frac{score_i}{log_2(i+1)}$$
+where $score_i$ is the score of essay that is ranked at the \textit{i}th position among all essays from the same essay set by the model. The premise of DCG is that essay with high score but ranked lower by the model should be penalized, as the score is reduced logarithmically proportional to the rank given by the model.
+
+In our problem, essay sets contain different number of essays, hence comparing a model's performance from one essay set to the other cannot be consistently achieved using DCG alone. To address this issue, we report the Normalized Discounted Cumulative Gain (NDCG) instead:
+
+$$NDCG=\frac{DCG}{IDCG}$$
+where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays in the set by their scores and then calculating the DCG.
 
 \subsection*{Quadratic Kappa}
 
