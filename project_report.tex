@@ -198,24 +198,7 @@ where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays
 
 \section*{Results}
 
-\begin{table}
-	\begin{tabular}{c|c|c|c|c}
-		Model & Accuracy & MSE & NDCG & Quadratic Kappa\\\hline
-		Char-level CNN (1-layer, one-hot) & & & & \\
-		Char-level CNN (1-layer, embed) &  & & & \\
-		Char-level CNN (6-layer, one-hot) & & & & \\
-		Char-level CNN (6-layer, embed) & & & & \\
-		Word-level DNN Classification (5-layer,GloVe embed) & & & & \\
-		Word-level DNN Regression(5-layer, GloVe embed) & & & & \\
-		Sentence-level LSTM & -- & -- & 0.9482 & --\\
-		Passage-level Bi-directional LSTM Classification (GloVe embed) & & & & \\
-		Passage-level Bi-directional LSTM Regression(GloVe embed) & & & & \\
 
-		
-	\end{tabular}
-	\caption{Performance on test set evaluated via the metrics discussed above.}
-	\label{fig:eval}
-\end{table}
 
 \begin{table}
 	\begin{tabular}{c|c|c|c|c|c}
