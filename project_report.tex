@@ -89,8 +89,8 @@ The dataset contains both the essay set ID and essay ID, as well as the entire t
 		4 & 0-3 & 1407 & 183 & 180 \\
 		5 & 0-4 & 1458 & 178 & 169\\
 		6 & 0-4 & 1458 & 157 & 185\\
-		7 & 2-24 & 1257 & 151 & 161\\ 
-		8 & 10-60 & 612 & 52 & 59\\\hline
+		7 & 0-30 & 1257 & 151 & 161\\ 
+		8 & 0-60 & 612 & 52 & 59\\\hline
 		Total & 0-60 & 10419 & 1260 & 1300
 	\end{tabular}
 	\caption{Statistics for the data set of essays and scores.}
@@ -194,19 +194,40 @@ In our problem, essay sets contain different number of essays, hence comparing a
 $$NDCG=\frac{DCG}{IDCG}$$
 where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays in the set by their scores and then calculating the DCG.
 
-\subsection*{Quadratic Kappa}
-
 \section*{Results}
 
+
+\begin{table}
+	\begin{tabular}{c|c|c|c}
+		Model & Accuracy & MSE & nDCG  \\\hline
+		Char-level CNN (1-layer, one-hot) & 80.9\% & 0.455 & 0.998 \\
+		Char-level CNN (1-layer, embed) & 66.7\% & 1.158& 0.910\\
+		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 \\
+		Char-level CNN (6-layer, embed) & 36.7\%& 1.158 & 0.910 \\
+		Word-level DNN Classification (5-layer,GloVe embed) & & &  \\
+		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
+		Sentence-level LSTM & -- & -- & 0.9482 \\
+		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
+		Passage-level Bi-directional LSTM Regression(GloVe embed) & & & 
+		
+	\end{tabular}
+	\caption{Performance on test set evaluated via the metrics discussed above.}
+	\label{fig:eval}
+\end{table}
 
 
 \begin{table}
 	\begin{tabular}{c|c|c|c|c|c}
 		Model & Embed Dim. & Filter Sizes & Num. Filters & Pooling & Hidden Dim. \\\hline
 		Char-level CNN (1-layer, one-hot) & -- & 64 & 64 & 64 & 32 \\
-		Char-level CNN (1-layer, embed) &  & & & & \\
-		Char-level CNN (6-layer, one-hot) & -- & & & & \\
-		Char-level CNN (6-layer, embed) & & & & & \\
+		Char-level CNN (1-layer, embed) &  30 & 64 & 128 & 64 & 32 \\
+		Char-level CNN (6-layer, one-hot) & -- & $(64, 32, 16, 8, 4, 2)$ & 64 & $(4,4,4)$ & 64 \\
+		Char-level CNN (6-layer, embed) & 30 & $(64, 64, 32, 16, 4, 4)$ & 64 & $(6,4,4)$ & 128 \\
+		Word-level MLP  & & & & & \\
+		Word-level LSTM  & & & & & \\
+		Word-level Bi-LSTM  & & & & & \\
+		Ranking Model & & & & & \\
+		...  & & & & &
 	\end{tabular}
 	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
 	\label{fig:params}
