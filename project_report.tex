@@ -134,6 +134,8 @@ where $o_{ij}\equiv o_i-o_j, P_{ij}\equiv 1/(1+e^{-o_{ij}})$, and $y_{ij}$ is th
 
 The model architecture is shown in Figure \ref{fig:rankmodel}. Note that we add one more LSTM layer with reverse direction to further exploit the trainsition pattern in essays.
 
+Another issue is the number of essay pairs used in training. Note that the training set will grow exponentially large if we make all the pairs in each essay set. Since each essay set in our problem contains more than one thousand essays, it is computationally infeasible to use all the essay pairs as training data. To keep the order information in original dataset as much as possible, we sort the essays in each essay set by their scores, and pair the top $K$ essays with the other essays in the same essay set. In other words, we keep most of the information for determining what is a good essay while no essay is discarded. Note that this also reduces the number of essay pairs in which the two essays have similar scores, which is a potential way to reduce noise as all essays were graded by human and it is a hazard to determine the order of essays with similar scores.
+
 \begin{figure}
 	\includegraphics[width=0.6\textwidth]{rankmodel.jpg}
 	\caption{Architecture of sentence-level LSTM model with pairwise ranking loss. Note that the weights of the two LSTM models are shared.}
