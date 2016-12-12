@@ -9,9 +9,9 @@ from keras.layers.core import Flatten
 from keras.layers import Merge
 
 max_len = 30
-num_epoch = 2
-train_sample_num = 3000
-val_sample_num = 1000
+num_epoch = 5
+train_sample_num = 10000
+val_sample_num = 2000
 model_type = 'LSTM'  # 'CNN' or 'LSTM'
 
 val_data = cPickle.load(open("val.pkl", 'rb'))

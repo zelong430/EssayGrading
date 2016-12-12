@@ -2,7 +2,7 @@ import re
 import cPickle
 import os
 import numpy as np
-from gensim.models import word2vec
+#from gensim.models import word2vec
 
 datafiles = ['../processed_data/train.tsv', '../processed_data/val.tsv',
             '../processed_data/test.tsv']

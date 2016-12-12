@@ -1,0 +1,37 @@
+discarding /n/home10/won1k/.conda/envs/NLP/bin from PATH
+prepending /n/home10/won1k/.conda/envs/NLP/bin to PATH
+Using Theano backend.
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by process '38451' (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
+INFO (theano.gof.compilelock): Waiting for existing lock by unknown process (I am process '47889')
+INFO (theano.gof.compilelock): To manually release the lock, delete /n/home10/won1k/.theano/compiledir_Linux-2.6-el6.x86_64-x86_64-with-centos-6.5-Final-x86_64-2.7.12-64/lock_dir
