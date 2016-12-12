@@ -12,65 +12,61 @@ set_range = {
     8: (0, 60)
 }
 
+def evaluate(pred_y, true_y = None, against = None):
+	""" 
+	A function that evaluate the result of predicted rate against true rate.
+	The final score is averaged among all possible set of essay.
 
-def evaluate(pred_y, true_y=None, against=None):
-    """
-    A function that evaluate the result of predicted rate against true rate.
-    The final score is averaged among all possible set of essay.
+	Attributes
+	----------
+	_pred_y: 2D numpy array with 3 columns of predicted score for each essay
+		1st column contains the essay_set id of each essay, int
+		2nd column contains the essay_id of each essay, int
+		3rd column contains the rate for each essay, must be integer, int
 
-    Attributes
-    ----------
-    _pred_y: 2D numpy array with 3 columns of predicted score for each essay
-        1st column contains the essay_set id of each essay, int
-        2nd column contains the essay_id of each essay, int
-        3rd column contains the rate for each essay, must be integer, int
+		1. number of rows of pred_y must be same with true_y
+		2. the essay_set id and essay_id(i.e the first two values) on each row must
+			match between pred_y and true_y
+		3. the third column must only contain integer values
 
-        1. number of rows of pred_y must be same with true_y
-        2. the essay_set id and essay_id(i.e the first two values) on each row must
-            match between pred_y and true_y
-        3. the third column must only contain integer values
+	_true_y: 2D numpy array with 3 columns of true score for each essay
+		1st column contains the essay_set id of each essay, int
+		2nd column contains the essay_id of each essay, int
+		3rd column contains the rate for each essay, must be integer, int
+		
+		1. number of rows of pred_y must be same with true_y
+		2. the essay_set id and essay_id(i.e the first two values) on each row must
+			match between pred_y and true_y
+		3. the third column must only contain integer values
+		4. if no true_y is provided, the function will evaluate against predefined
+			results for train/validate/test set by providing one of the three options
+			for the argument against
 
-    _true_y: 2D numpy array with 3 columns of true score for each essay
-        1st column contains the essay_set id of each essay, int
-        2nd column contains the essay_id of each essay, int
-        3rd column contains the rate for each essay, must be integer, int
+	_against: integer with 3 possible values 0,1,2
+		When this argument is provided, the numpy array provided in true_y will be ignore.
+		The function will evaluate pred_y against predefined labels store in the "processed_data"
+		folder. 
 
-        1. number of rows of pred_y must be same with true_y
-        2. the essay_set id and essay_id(i.e the first two values) on each row must
-            match between pred_y and true_y
-        3. the third column must only contain integer values
-        4. if no true_y is provided, the function will evaluate against predefined
-            results for train/validate/test set by providing one of the three options
-            for the argument against
-
-    _against: integer with 3 possible values 0,1,2
-        When this argument is provided, the numpy array provided in true_y will be ignore.
-        The function will evaluate pred_y against predefined labels store in the "processed_data"
-        folder.
-
-        against = 0: will evaluate pred_y against train.tsv
-        against = 1: will evaluate pred_y against val.tsv
-        against = 2: will evaluate pred_y against test.tsv
-    """
-    assert ((true_y is not None) or (against is not None))
-    if against is not None:
-        true_y = read_label(against)
-    if pred_y.dtype != 'int64' or true_y.dtype != 'int64':
-        raise ValueError("The two numpy arrays must be numpy array with data type int64")
-    if np.all(pred_y[:, 0] == true_y[:, 0]) != True or np.all(pred_y[:, 1] == true_y[:, 1]) != True:
-        raise ValueError(
-            'The first two columns of pred_y and true_y must match, please check the essay_id and essay_set id')
-    list_kappa = np.zeros(8)
-    for i in range(1, 9):
-        list_kappa[i - 1] = quadratic_weighted_kappa(pred_y[pred_y[:, 0] == i, 2], true_y[true_y[:, 0] == i, 2], \
-                                                     min_rating=set_range[i][0], max_rating=set_range[i][1]
-                                                     )
-    list_kappa[list_kappa > 0.999] = 0.999
-    z = 0.5 * np.log((1 + list_kappa) / (1 - list_kappa))
-    z = z.mean()
-    averaged_kappa = (np.exp(2 * z) - 1) / (np.exp(2 * z) + 1)
-    return averaged_kappa
-
+		against = 0: will evaluate pred_y against train.tsv
+		against = 1: will evaluate pred_y against val.tsv
+		against = 2: will evaluate pred_y against test.tsv
+	"""
+	NUM_SET = 8
+	assert ((true_y is not None) or (against is not None))
+	if against is not None:
+		true_y = read_label(against)
+	if pred_y.dtype != 'int64' or true_y.dtype != 'int64':
+		raise ValueError("The two numpy arrays must be numpy array with data type int64")
+	if np.all(pred_y[:,0] == true_y[:,0]) != True or np.all(pred_y[:,1] == true_y[:,1]) != True:
+		raise ValueError('The first two columns of pred_y and true_y must match, please check the essay_id and essay_set id')
+	list_kappa = np.zeros(NUM_SET)
+	for i in range(1, NUM_SET + 1):
+		list_kappa[i-1] = quadratic_weighted_kappa(pred_y[pred_y[:,0] == i, 2], true_y[true_y[:,0] == i, 2])
+	list_kappa[list_kappa > 0.999] = 0.999
+	z = 0.5 * np.log((1 + list_kappa)/(1 - list_kappa))	
+	z = z.mean()
+	averaged_kappa = (np.exp(2*z) - 1)/(np.exp(2*z) + 1)
+	return averaged_kappa
 
 def read_label(file):
     if file == 0:
