@@ -113,9 +113,15 @@ One way to deal with such cases is to consider character-level models rather tha
 
 {\em Training.} In this formulation, we primarily treated the essay score as a percentage of the score range (i.e. for essay set 1, which has range 2-12, an essay with score 6 would be treated as 0.4), and used logistic regression as our final output. We used standard stochastic gradient descent (SGD) with momentum for training, using binary cross-entropy loss as our objective.
 
-\subsection*{Word-Level LSTM}
+\subsection*{Word-Level Deep Neural Network}
 
-An issue encountered in character-level models on this task, however, is that the models are unable to leverage semantic relationships between the words in order to make better predictions regarding essay quality. 
+An issue encountered in character-level models on this task, however, is that the models are unable to leverage semantic of words in order to make better predictions regarding essay quality. The word level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of words could somehow represent the quality of an essay. There could be advanced or ``good'' words that the essays with high grade tends to have, and similarly common words or ``bad'' words that usually associate with low quality essays. In addition, since all mis-spelled words are given zero vectors, this model could easily discriminate essays with a lot of miss-spelled words, average value toward 0, from those containing few miss-spelled words. 
+
+In the data procssing stage, the pre-trained GLoVe word vectors are utlized to embed all the word in an essay to fixed length, and average them to get the ``average word vector'' to represent the essay. The fixed dimension ``'average word vectors' are then fed into a fully connected deep neural network model with 5 hidden layers and relu activation function. The output layer of the model is constructed differently for two different model. For the classification problem, the output layer is a softmax layer with 61 units representing all the possible grade ranging from 0 to 60. For the regression problem, the output layer is one single units with no activation function for prediction of real number values, as known as Multilayer Perceptron Model. 
+
+In the training stage, two over-fitted model were first constructed for DNN Classification and Multilayer Perceptron Model. Then, the models are regularized by introducing, Elastic Net Regularization and Dropout at each layer. The best performance model was obtained by using the ``checkpoint'' functionality in Keras package to record the best performance over validation set. 
+
+The limitation of this model is that it only consider the wording of an essay without taking the ordering of words, sentence structures and essay length into consideration. For this model, an essay with properly wording and perfect sentence structure will be embeded exactly same as an essay with the same words but disordered sentence structure. 
 
 \subsection*{Sentence-Level LSTM and Pairwise Ranking Model}
 
@@ -141,6 +147,22 @@ Another issue is the number of essay pairs used in training. Note that the train
 	\caption{Architecture of sentence-level LSTM model with pairwise ranking loss. Note that the weights of the two LSTM models are shared.}
 	\label{fig:rankmodel}
 \end{figure}
+
+\subsection*{Passage-Level Bi-directional LSTM Model}
+
+This passage -level model is designed to take into account as much information regarding the structure of an essay as possible. The wording, ordering of words, sentence structure, sentence length and essay length are encoded. 
+
+The model is constructed as following:
+1. For each essay, all sentences is padded with START and END. All the words, including START and END, are encoded as a integer index. Miss-spelled words or words with low frequency are given 0.
+
+2. All essay are padded into fixed length sequence of integer indexs. Short essays are padded with 0 and long essays are truncated from back.
+
+3. The sequences of index representing each essay are transformed into sequence of vectors using pre-trained GloVe embedding with dimension of 300.
+
+4. The sequence of word embeddings are fed into two LSTM layer with forward direction and backward direction.
+
+5. The last outputs of the two LSTM model are concated togather and fed into the output layer. The output layer could either be softmax with 61 units or one unit without activation function, for classification and regression setting respectively.
+
 
 
 \section*{Metrics}
@@ -183,7 +205,13 @@ where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays
 		Char-level CNN (1-layer, embed) &  & & & \\
 		Char-level CNN (6-layer, one-hot) & & & & \\
 		Char-level CNN (6-layer, embed) & & & & \\
-		Sentence-level LSTM & -- & -- & 0.9482 & --
+		Word-level DNN Classification (5-layer,GloVe embed) & & & & \\
+		Word-level DNN Regression(5-layer, GloVe embed) & & & & \\
+		Sentence-level LSTM & -- & -- & 0.9482 & --\\
+		Passage-level Bi-directional LSTM Classification (GloVe embed) & & & & \\
+		Passage-level Bi-directional LSTM Regression(GloVe embed) & & & & \\
+
+		
 	\end{tabular}
 	\caption{Performance on test set evaluated via the metrics discussed above.}
 	\label{fig:eval}
