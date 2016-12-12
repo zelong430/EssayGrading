@@ -138,17 +138,20 @@ $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 
 \subsection*{Discounted Cumulative Gain (nDCG)}
 
-\subsection*{Quadratic Kappa}
-
 \section*{Results}
 
 \begin{table}
-	\begin{tabular}{c|c|c|c|c}
-		Model & Accuracy & MSE & nDCG & Quadratic Kappa\\\hline
-		Char-level CNN (1-layer, one-hot) & & & & \\
-		Char-level CNN (1-layer, embed) &  & & & \\
-		Char-level CNN (6-layer, one-hot) & & & & \\
-		Char-level CNN (6-layer, embed) & & & & \\
+	\begin{tabular}{c|c|c|c}
+		Model & Accuracy & MSE & nDCG \\\hline
+		Char-level CNN (1-layer, one-hot) & 80.9\% & 0.455 & 0.998 \\
+		Char-level CNN (1-layer, embed) &  & & \\
+		Char-level CNN (6-layer, one-hot) & & & \\
+		Char-level CNN (6-layer, embed) & & & \\
+		Word-level MLP \\
+		Word-level LSTM \\
+		Word-level Bi-LSTM \\
+		Ranking Model \\
+		...
 	\end{tabular}
 	\caption{Performance on test set evaluated via the metrics discussed above.}
 	\label{fig:eval}
@@ -158,9 +161,14 @@ $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 	\begin{tabular}{c|c|c|c|c|c}
 		Model & Embed Dim. & Filter Sizes & Num. Filters & Pooling & Hidden Dim. \\\hline
 		Char-level CNN (1-layer, one-hot) & -- & 64 & 64 & 64 & 32 \\
-		Char-level CNN (1-layer, embed) &  & & & & \\
+		Char-level CNN (1-layer, embed) &  16 & & & & \\
 		Char-level CNN (6-layer, one-hot) & -- & & & & \\
-		Char-level CNN (6-layer, embed) & & & & & \\
+		Char-level CNN (6-layer, embed) & 30 & & & & \\
+		Word-level MLP  & & & & & \\
+		Word-level LSTM  & & & & & \\
+		Word-level Bi-LSTM  & & & & & \\
+		Ranking Model & & & & & \\
+		...  & & & & &
 	\end{tabular}
 	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
 	\label{fig:params}
