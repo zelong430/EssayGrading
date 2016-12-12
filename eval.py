@@ -1,5 +1,6 @@
 import numpy as np
 import csv, sys
+from evaluate import quadratic_weighted_kappa, evaluate
 
 
 def accuracy(pred, actual):
@@ -54,7 +55,7 @@ def ranking(pred_file, ndcg_num = -1):
             IDCG += np.exp2(sp[k][1]) / np.log2(k + 2)
 
         avgNDCG += DCG/IDCG
-        print '  {0}th class NDCG: {1}'.format(i, DCG/IDCG)
+        #print '  {0}th class NDCG: {1}'.format(i, DCG/IDCG)
 
     return avgNDCG/cnt
 
@@ -88,6 +89,7 @@ def evaluate(pred_file):
     print("Classification Accuracy: {}".format(accuracy(pred, actual)))
     print("MSE: {}".format(mse(pred, actual)))
     print("Average NDCG: {}".format(ranking(pred_file)))
+    print ('Quadratic Weighted Kappa: {}'.format(quadratic_weighted_kappa(pred, actual)))
 
     return True
 
