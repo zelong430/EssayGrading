@@ -1,3 +1,7 @@
 *.txt
 *.pkl
 *.csv
+gensim
+*.aux
+*.log
+*.synctex

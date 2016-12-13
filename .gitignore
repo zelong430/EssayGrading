@@ -2,3 +2,6 @@
 *.pkl
 *.csv
 gensim
+*.aux
+*.log
+*.synctex.gz

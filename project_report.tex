@@ -115,32 +115,32 @@ One way to deal with such cases is to consider character-level models rather tha
 
 \subsection*{Word-Level Deep Neural Network}
 
-An issue encountered in character-level models on this task, however, is that the models are unable to leverage semantic of words in order to make better predictions regarding essay quality. The word level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of words could somehow represent the quality of an essay. There could be advanced or ``good'' words that the essays with high grade tends to have, and similarly common words or ``bad'' words that usually associate with low quality essays. In addition, since all mis-spelled words are given zero vectors, this model could easily discriminate essays with a lot of miss-spelled words, average value toward 0, from those containing few miss-spelled words. 
+An issue encountered in character-level models on this task, however, is that the models are unable to leverage the semantic information of words in order to make better predictions regarding essay quality. The word-level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of certain words over others could represent the quality of an essay. There could be more sophisticated or ``good'' words that the essays with high scores tend to contain, and similarly common or ``bad'' words that are usually associated with low-quality essays. In addition, since all misspelled words are given zero vectors (as they lie outside the vocabulary), this model could easily discriminate essays with a lot of misspelled words, which have an average value near 0, from those containing few misspelled words. 
 
-In the data procssing stage, the pre-trained GLoVe word vectors are utlized to embed all the word in an essay to fixed length, and average them to get the ``average word vector'' to represent the essay. The fixed dimension ``'average word vectors' are then fed into a fully connected deep neural network model with 5 hidden layers and relu activation function. The output layer of the model is constructed differently for two different model. For the classification problem, the output layer is a softmax layer with 61 units representing all the possible grade ranging from 0 to 60. For the regression problem, the output layer is one single units with no activation function for prediction of real number values, as known as Multilayer Perceptron Model. 
+In the data processing stage, the pretrained GLoVe word vectors are utilized to embed all the word in an essay to a fixed length, and these embeddings are then averaged to get the ``average word vector'' of an essay. These fixed dimension ``average word vectors'' are then fed into a fully-connected deep neural network model with 5 hidden layers and rectifier linear unit (ReLU) activation. We consider two different types of output layers, corresponding to different problem formulations. Treating scores as a classification problem, we employ a softmax layer for the output, using 61 units representing all the possible scores ranging from 0 to 60. On the other hand, we can treat scores as a regression problem, for which the output layer is one single unit with linear activation for prediction of a real number value (also known as a multilayer perceptron (MLP) model).
 
-In the training stage, two over-fitted model were first constructed for DNN Classification and Multilayer Perceptron Model. Then, the models are regularized by introducing, Elastic Net Regularization and Dropout at each layer. The best performance model was obtained by using the ``checkpoint'' functionality in Keras package to record the best performance over validation set. 
+{\em Training.} In the training stage, we used either categorical cross-entropy (for classification) or squared-error (for regression) as our loss criteria. Training naively yielded two over-fitted models for DNN classification and MLP. Then, the models were regularized by introducing elastic net regularization and dropout at each layer. The best-performing model was obtained by using the ``checkpoint'' functionality in Keras package to record the best performance over validation set, essentially using a form of early stopping.
 
-The limitation of this model is that it only consider the wording of an essay without taking the ordering of words, sentence structures and essay length into consideration. For this model, an essay with properly wording and perfect sentence structure will be embeded exactly same as an essay with the same words but disordered sentence structure. 
+A limitation of these models is that they only consider the wording of an essay without taking the ordering of words, sentence structures, and essay length into consideration. In fact, an essay with proper wording and perfect sentence structure will be embedded exactly same as an essay with the same words but completely disordered sentence structure. 
 
 \subsection*{Sentence-Level LSTM and Pairwise Ranking Model}
 
-In addition to character-level and word-level models, we also consider sentence-level model for essay grading. Suppose each sentence is encoded into a vector of fixed dimension, then essay can be seen as a series of sentence vectors. Hence it is natural to use LSTM model to capture sentence-level transition patterns in each essay and measure the quality of essays by assessing such patterns. There are two ways to encode a sentence into a vector:
+To rectify the above problem, we also consider sentence-level models for essay grading. Suppose each sentence is encoded into a vector of fixed dimension; then the essay can be seen as a series of sentence vectors. Hence it is natural to use an LSTM model to capture sentence-level transition patterns in each essay and measure the quality of essays by assessing such patterns. There are two ways to encode a sentence into a vector:
 \begin{enumerate}
 \item Bag-of-Words model: The sentence vector is the sum of word vectors of the words in the sentence.
 \item Sequence model: The sentence vector is the output of another LSTM model, whose input is the word vector sequence of the words in the sentence. 
 \end{enumerate}
-To reduce computational complexity, we use bag-of-words model to encode each sentence into vector, where the pre-trained word vectors are provided by GloVe \cite{glove}.
+To reduce computational complexity, we use the bag-of-words model to encode each sentence into a vector, where the pretrained word vectors are provided by GloVe \cite{glove}.
 
-One issue encountered in classification model and regression model in this task is that the score range is different across sets. In previous section, we address this issue by normalizing the score to real values in $[0, 1]$. However, essays from different set may not be comparable as the assessment standard is different from one set to another. Either classification model or regression model is trained with essays from all 8 sets with abosulte scores, which implicitly introduces incorrect order information. Hence we  consider to use learning-to-rank model to learn the score order instead of learning the scores directly. 
+One issue encountered in the classification and regression models in this task is that the score range is different across sets. In the previous section, we addreseds this issue by normalizing the score to real values in $[0, 1]$. However, essays from different set may not be comparable as the assessment standard is different from one set to another. Both the classification and regression models are trained with essays from all 8 sets with absolute scores, which implicitly introduces incorrect order information. Hence we consider using a ranking model to learn the score order instead of learning the scores directly. 
 
-We make pairs of essays from the same set. For each pair $(d_l, d_r)$, we assign label 0 if $score_l>score_r$ and label 1 if $score_l<score_r$. In other words, labels represent the order information of essay pairs. Denote by $o_i$ the output score of sentence-level LSTM model with input essay $d_i$. We use the cross entropy loss function
+{\em Training.} We consider pairs of essays from the same essay set. For each pair $(d_l, d_r)$, we assign label 0 if $score_l>score_r$ and label 1 if $score_l<score_r$. In other words, labels represent the order information of essay pairs. Denote by $o_i$ the output score of sentence-level LSTM model with input essay $d_i$. We then use the cross entropy loss function:
 $$L_{ij}\equiv L(o_{ij})=-y_{ij}\log P_{ij}-(1-y_{ij})\log(1-P_{ij})$$ 
 where $o_{ij}\equiv o_i-o_j, P_{ij}\equiv 1/(1+e^{-o_{ij}})$, and $y_{ij}$ is the label of $(d_i, d_j)$. In fact, this is the pairwise loss function proposed by Burges et al., 2005 \cite{ranknet}.
 
-The model architecture is shown in Figure \ref{fig:rankmodel}. Note that we add one more LSTM layer with reverse direction to further exploit the trainsition pattern in essays.
+The model architecture is shown in Figure \ref{fig:rankmodel}. Note that we add one more LSTM layer in the reverse direction to further exploit the transition pattern between sentences in essays.
 
-Another issue is the number of essay pairs used in training. Note that the training set will grow exponentially large if we make all the pairs in each essay set. Since each essay set in our problem contains more than one thousand essays, it is computationally infeasible to use all the essay pairs as training data. To keep the order information in original dataset as much as possible, we sort the essays in each essay set by their scores, and pair the top $K$ essays with the other essays in the same essay set. In other words, we keep most of the information for determining what is a good essay while no essay is discarded. Note that this also reduces the number of essay pairs in which the two essays have similar scores, which is a potential way to reduce noise as all essays were graded by human and it is a hazard to determine the order of essays with similar scores.
+Another issue is the number of essay pairs used in training. Note that the training set will grow exponentially large if we make all the pairs in each essay set. Since each essay set in our problem contains more than a thousand essays, it is computationally infeasible to use all the essay pairs as training data. To preserve the order information in original dataset as much as possible, we sort the essays in each essay set by their scores, and pair the top $K$ essays with all of the other essays in the same essay set. In other words, we keep most of the information for determining what is a good essay, and no essay is discarded. Note that this also reduces the number of essay pairs in which the two essays have similar scores, which is a potential way to reduce noise as all essays were graded by human and it is hazardous to determine the order of essays with similar scores.
 
 \begin{figure}
 	\includegraphics[width=0.6\textwidth]{rankmodel.jpg}
@@ -148,20 +148,11 @@ Another issue is the number of essay pairs used in training. Note that the train
 	\label{fig:rankmodel}
 \end{figure}
 
-\subsection*{Passage-Level Bi-directional LSTM Model}
+\subsection*{Passage-Level Bidirectional LSTM Model}
 
-This passage -level model is designed to take into account as much information regarding the structure of an essay as possible. The wording, ordering of words, sentence structure, sentence length and essay length are encoded. 
+Finally, we consider a passage-level model that is designed to take into account as much information regarding the structure of an essay as possible. The wording, ordering of words, sentence structure, sentence length and essay length are all encoded naturally in this model. The model is constructed in the following fashion.
 
-The model is constructed as following:
-1. For each essay, all sentences is padded with START and END. All the words, including START and END, are encoded as a integer index. Miss-spelled words or words with low frequency are given 0.
-
-2. All essay are padded into fixed length sequence of integer indexs. Short essays are padded with 0 and long essays are truncated from back.
-
-3. The sequences of index representing each essay are transformed into sequence of vectors using pre-trained GloVe embedding with dimension of 300.
-
-4. The sequence of word embeddings are fed into two LSTM layer with forward direction and backward direction.
-
-5. The last outputs of the two LSTM model are concated togather and fed into the output layer. The output layer could either be softmax with 61 units or one unit without activation function, for classification and regression setting respectively.
+For each essay, all sentences is padded with START and END tokens. All of the words, including START and END, are encoded as an integer index, and misspelled words or words with low frequency are denoted as 0. All essays are padded into fixed length sequence of integer indices. Short essays are padded with 0 and long essays are truncated from the end. The sequences of indices representing each essay are transformed into sequences of vectors using pretrained GloVe embedding with dimension of 300. These sequences of word embeddings are then fed into a bidirectional LSTM model, which yields passage-level vector representations. The passage-level encoded vectors, i.e. the last outputs of this bidirectional LSTM model, are concatenated together (forward and reverse direction) and fed into the output layer. As with the word-level models, the output layer could either be a softmax with 61 units or one unit with linear activation, for classification and regression respectively.
 
 
 
@@ -194,16 +185,26 @@ In our problem, essay sets contain different number of essays, hence comparing a
 $$NDCG=\frac{DCG}{IDCG}$$
 where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays in the set by their scores and then calculating the DCG.
 
-\section*{Results}
+\subsection*{Quadratic Kappa}
+
+
+
+\section*{Results and Discussion}
+
+Our results are presented in Table \ref{fig:eval}, with the hyperparameter and architectural settings determined on validation given in Table \ref{fig:params}. Most importantly, we find that deep networks with a variety of architectures can perform competitively with the results of the models from the 2012 competition, which generally employed painstakingly hand-crafted features that do not generalize across essay prompts.
+
+Another result to note not properly reflected in the tables is that our models were often able to distinguish between the different essay prompts with no explicit guidance. In other words, the models automatically classified or predicted scores that fell into the proper score range for each test essay without needed other information regarding the essay set. As such information was provided explicitly to previous models, this demonstrates the learning capacity of deep architectures to both perform well on this task as well as to generalize information across prompts.
+
+Finally, we find that different architectures provide different strengths in terms of final performance on the test set. For example, the character-level CNN models were able to perform quite well on classification and nDCG, but generally failed to perform as well on the quadratic kappa metric or MSE. This indicates that character-level CNN models obtain good predictions for many essays, but on incorrect predictions fail to get scores that are close to the actual scores. On the other hand, models that captured sequential information such as the sentence- or passage-level LSTMs performed very well on the MSE and quadratic kappa metrics, indicating that even when these models failed at predicting precisely the right score, they often were able to predict scores that were close to the actual ones. These results suggest that depending on the preferences of the assessor, different models for essay grading may be more suitable.
 
 
 \begin{table}
 	\begin{tabular}{c|c|c|c}
 		Model & Accuracy & MSE & nDCG  \\\hline
-		Char-level CNN (1-layer, one-hot) & 80.9\% & 0.455 & 0.998 \\
+		Char-level CNN (1-layer, one-hot) & 68.3\% & 0.782 & 0.923 \\
 		Char-level CNN (1-layer, embed) & 66.7\% & 1.158& 0.910\\
 		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 \\
-		Char-level CNN (6-layer, embed) & 36.7\%& 1.158 & 0.910 \\
+		Char-level CNN (6-layer, embed) & 36.7\%& 1.179 & 0.910 \\
 		Word-level DNN Classification (5-layer,GloVe embed) & & &  \\
 		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
 		Sentence-level LSTM & -- & -- & 0.9482 \\
@@ -233,7 +234,6 @@ where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays
 	\label{fig:params}
 \end{table}
 
-\section*{Discussion}
 
 \section*{Member Contributions}
 
