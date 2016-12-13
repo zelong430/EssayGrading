@@ -66,7 +66,7 @@
 
 One prominent impediment preventing the enhancement of curricula in K-12 education to focus more on critical reasoning ability and analytical skills is the difficulty of scoring tests to measure these abilities. It is generally the case that measuring such skills requires inviting the student for open-ended answers rather than simple, multiple-choice ones; unfortunately, tests that require essays or other individually-written responses are difficult to score automatically and necessitate scoring by human graders. Such grading involves substantial time and expense from both testing companies and government agencies (for standardized exams), and as a result, most such tests have relied more on multiple-choice questions, limiting the ability to assess more sophisticated skills.
 
-This has long motivated the development of automated system for essay grading. Much effort has been put into building a satisfactory system that could reliable generate scores in line with those of human judges. The Intelligent Essay Assessor (IEA) was first used to score essays for large undergraduate courses in 1994 \cite{iea}, and the e-Rater, an automated reader developed by the Educational Testing Service was used to grade large-scale essays on standardized exams \cite{erater}.
+This has long motivated the development of automated system for essay grading. Much effort has been put into building a satisfactory system that could reliable generate scores in line with those of human judges. The Intelligent Essay Assessor (IEA) was first used to score essays for large undergraduate courses in 1994 \cite{iea}, and the e-Rater, an automated reader developed by the Educational Testing Service was used to grade large-scale essays on standardized exams \cite{erater}. More recently, many teams competed in the Automated Student Assessment Prize competition on Kaggle in 2012, sponsored by the Hewlett Foundation \cite{kaggle}.
 
 All of these examples used on the order of hundreds of hand-crafted features to generate the essay scores. Recently, however, the development of more automatic methods in natural language processing based on deep neural networks has suggested that systems for such tasks boasting comparable or even superior performance can be constructed ``from scratch'' without manually crafting features for the algorithm. For example, the work of Collobert et al. \cite{collobert}, which helped to inspire the current wave of deep learning applications in NLP, demonstrated that appropriately-trained neural network models incorporating no hand-crafted features could achieve performance rivaling that of state-of-the-art systems based on extensive feature crafting.
 
@@ -289,10 +289,13 @@ Attali, Y. and J. Burstein (2006). ``Automated Essay Scoring with e-Rater V2.'' 
 Collobert, R.
 
 \bibitem{glove}
-Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. GloVe: Global Vectors for Word Representation.
+Pennington, J., R. Socher, and C. D. Manning (2014).`` GloVe: Global Vectors for Word Representation.;;
 
 \bibitem{ranknet}
-Burges, C., Shaked, T., Renshaw, E., Lazier, A., Deeds, M., Hamilton, N., and Hullender, G. (2005). Learning to rank using gradient descent. In Proceedings of the 22nd international conference on Machine learning (pp. 89-96). ACM.
+Burges, C., Shaked, T., Renshaw, E., Lazier, A., Deeds, M., Hamilton, N., and Hullender, G. (2005). ``Learning to rank using gradient descent.'' {\em In Proceedings of the 22nd international Conference on Machine Learning}: 89-96.
+
+\bibitem{kaggle}
+Kaggle (2012). ``Develop an automated scoring algorithm for student-written essays.'' https://www.kaggle.com/c/asap-aes.
 
 
 \end{thebibliography}
