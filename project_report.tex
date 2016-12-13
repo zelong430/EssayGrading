@@ -185,7 +185,21 @@ In our problem, essay sets contain different number of essays, hence comparing a
 $$NDCG=\frac{DCG}{IDCG}$$
 where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays in the set by their scores and then calculating the DCG.
 
-\subsection*{Quadratic Kappa}
+\subsection*{Quadratic Averaged Kappa}
+Another metric we considered is Quadratic Averaged Kappa, which measured the degree of agreement between two raters and weighted over the distance between different categories. For example, a score of 5 will gain more penalty if it is predicted as 8 than it is predicted as 6. The range of Quadratic Averaged Kappa is from -1 to 1, and 1 implies perfect agreement while 0 implies a random guess. 
+
+To calculate the Quadratic Averaged Kappa, one need to construct two N by N matrix $O$ and $E$, where N is the number of different grades. $O_{i,j}$ corresponds to the number of essays that received a rating i by Rater A and a rating j by Rater B. Therefore, the summation of $O$ across all i and j should be the total number of essay. For the matrix $E$, we first obtain two length-N vector $u$, $v$, where $u_i$ and $v_i$ represent the number of essay receiving a rating i from rater A and rater B respectively. The matrix $E$ is then the outer-product of vector $u$ and $v$, such that $O_{i,j} = u_i v_j$. Then the matrix $E$ is normalized so that it has same sum as the matrix $O$.
+
+Another weight matrix $W$ is calcaluated as following:
+$$
+W_{i,j} = \frac{(1-j)^2}{(N-1)^2}
+$$
+
+Finally the Quadratic Averaged Kappa is calculated:
+$$
+k = 1 - \frac{\sum_{i,j}w_{i,j}O_{i,j}}{\sum_{i,j}w_{i,j}E_{i,j}}
+$$
+
 
 
 
