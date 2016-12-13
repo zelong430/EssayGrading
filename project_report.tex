@@ -104,7 +104,7 @@ The dataset contains both the essay set ID and essay ID, as well as the entire t
 
 A prominent issue with essay grading is that many of the words in candidate essays are misspelled, so that they lie outside a fixed vocabulary. Most models with fixed vocabulary word embeddings can only deal with such words by treating them as ``UNK'' tokens, which removes any information that such words may convey about the quality of the essay. Unlike most natural language tasks for which out-of-vocabulary words are infrequent and often unimportant, misspellings can provide valuable information regarding the quality of the writing for grading student essays.
 
-One way to deal with such cases is to consider character-level models rather than word-level models. Thus, we consider a character-level convolutional neural network (CNN), which embeds each character into a $d$-dimensional vector ($d \approx 30$) and employs a series of 1D convolutions and max-pooling layers to extract efficient representations for inference. We stack fully-connected layers on top of the convolutional layers for final processing, and use either dense or one-hot encodings of the characters as input. We provide a schematic of our overall architecture in Figure \ref{fig:cnn}. We consider a 6 convolutional layer model inspired by the work of Zhang, Zhao, and LeCun, 2015 \cite{charnn} as well as a simpler, 1 convolutional layer model inspired by the work of Kim, 2014 \cite{kim14}.
+One way to deal with such cases is to consider character-level models rather than word-level models. Thus, we consider a character-level convolutional neural network (CNN), which embeds each character into a $d$-dimensional vector ($d \approx 30$) and employs a series of 1D convolutions and max-pooling layers to extract efficient representations for inference. We stack fully-connected layers on top of the convolutional layers for final processing, and use either dense or one-hot encodings of the characters as input. We provide a schematic of our overall architecture in Figure \ref{fig:cnn}. We consider a 6 convolutional layer model inspired by the work of Zhang, Zhao, and LeCun, 2015 \cite{charnn} as well as a 1 convolutional layer model inspired by the work of Kim, 2014 \cite{kim14} using multiple kernels and filter sizes.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{cnn.png}
@@ -221,7 +221,7 @@ $$
 
 \section*{Results and Discussion}
 
-Our results are presented in Table \ref{fig:eval}, with the hyperparameter and architectural settings determined on validation given in Table \ref{fig:params}. Most importantly, we find that deep networks with a variety of architectures can perform competitively with the results of the models from the 2012 competition, which generally employed painstakingly hand-crafted features that do not generalize across essay prompts.
+Our results are presented in Table \ref{fig:eval}, with the hyperparameter and architectural settings determined on validation. Most importantly, we find that deep networks with a variety of architectures can perform competitively with the results of the models from the 2012 competition, which generally employed painstakingly hand-crafted features that do not generalize across essay prompts.
 
 Another result to note not properly reflected in the tables is that our models were often able to distinguish between the different essay prompts with no explicit guidance. In other words, the models automatically classified or predicted scores that fell into the proper score range for each test essay without needed other information regarding the essay set. As such information was provided explicitly to previous models, this demonstrates the learning capacity of deep architectures to both perform well on this task as well as to generalize information across prompts.
 
@@ -231,18 +231,18 @@ Finally, we find that different architectures provide different strengths in ter
 \begin{table}
 	\begin{tabular}{c|c|c|c|c}
 		Model & Accuracy & MSE & nDCG & Quad. Kappa \\\hline
-		Char-level CNN (1-layer, one-hot) & 68.3\% & 0.782 & 0.923 \\
-		Char-level CNN (1-layer, embed) & 66.7\% & 1.158& 0.910\\
-		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 \\
-		Char-level CNN (6-layer, embed) & 36.7\%& 1.179 & 0.910 \\
-		Word-level DNN Classification (5-layer, GloVe embed) & & &  \\
-		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
-		Sentence-level LSTM & -- & -- & 0.9482 \\
-		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
-		Passage-level Bi-directional LSTM Regression(GloVe embed) & & & 
+		Char-level CNN (1-layer, one-hot) & 68.3\% & {\bf 0.782} & 0.923 & 0.936 \\
+		Char-level CNN (1-layer, embed) & 63.7\% & 1.158 & 0.910 & 0.923\\
+		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 & 0.843\\
+		Char-level CNN (6-layer, embed) & 36.7\%& 1.179 & 0.910 & 0.871\\
+		Word-level DNN Classification (5-layer, GloVe embed) & 49.4\% & 2.41 & 0.962 & 0.967 \\
+		Word-level DNN Regression(5-layer, GloVe embed) & 43.1\% & 0.895 & 0.957 & {\bf 0.973} \\
+		Sentence-level LSTM & -- & -- & {\bf 0.968} & -- \\
+		Passage-level Bi-directional LSTM Classification (GloVe embed) & {\bf 69.7\%} & 1.26 & 0.948 & 0.972  \\
+		Passage-level Bi-directional LSTM Regression(GloVe embed) & 43.8\% & 0.854 & 0.945 & 0.858 
 		
 	\end{tabular}
-	\caption{Performance on test set evaluated via the metrics discussed above; hyperparameter settings for each model were selected via performance on the validation set.}
+	\caption{Performance on test set evaluated via the metrics discussed above; hyperparameter settings for each model were selected via performance on the validation set. The best result on the test set is bolded.}
 	\label{fig:eval}
 \end{table}
 
