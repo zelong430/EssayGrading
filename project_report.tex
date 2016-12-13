@@ -59,7 +59,7 @@
 \maketitle
 
 \begin{abstract}
-	Automated essay grading is an important problem for advancing curricular assessments in K-12 education, as it allows for rapid evaluation of student-constructed responses and opens the way for the assessment of more sophisticated analytical and reasoning skills.  In this work, we investigate the performance of various deep architectures on the task of automated essay grading. We employ no hand-crafted features and explore both character-level and word-level models for this task, using both convolutional and recurrent architectures. We find that ... . In addition, we provide a more nuanced analysis of the strengths of various architectural and training choices by considering performance across a variety of metrics, showing that ... .
+	Automated essay grading is an important problem for advancing curricular assessments in K-12 education, as it allows for rapid evaluation of student-constructed responses and opens the way for the assessment of more sophisticated analytical and reasoning skills.  In this work, we investigate the performance of various deep architectures on the task of automated essay grading. We employ no hand-crafted features and explore both character-level and word-level models for this task, using both convolutional and recurrent architectures. We find that these different architectures and training paradigms offer complementary advantages on this task. In addition, we provide a more nuanced analysis of the strengths of various architectural and training choices by considering performance across a variety of metrics, showing that while certain models performed better on raw classification accuracy, others predicted scores that were closer on average to the actual scores.
 \end{abstract}
 
 \section*{Introduction and Related Work}
@@ -99,7 +99,8 @@ The dataset contains both the essay set ID and essay ID, as well as the entire t
 
 \section*{Models}
 
-\subsection*{Character-Level CNN}
+\subsection*{Character-Level CNN}\hfill\\
+\vskip -0.1in
 
 A prominent issue with essay grading is that many of the words in candidate essays are misspelled, so that they lie outside a fixed vocabulary. Most models with fixed vocabulary word embeddings can only deal with such words by treating them as ``UNK'' tokens, which removes any information that such words may convey about the quality of the essay. Unlike most natural language tasks for which out-of-vocabulary words are infrequent and often unimportant, misspellings can provide valuable information regarding the quality of the writing for grading student essays.
 
@@ -113,17 +114,25 @@ One way to deal with such cases is to consider character-level models rather tha
 
 {\em Training.} In this formulation, we primarily treated the essay score as a percentage of the score range (i.e. for essay set 1, which has range 2-12, an essay with score 6 would be treated as 0.4), and used logistic regression as our final output. We used standard stochastic gradient descent (SGD) with momentum for training, using binary cross-entropy loss as our objective.
 
-\subsection*{Word-Level Deep Neural Network}
+\subsection*{Word-Level Deep Neural Network}\hfill\\
+\vskip -0.1in
 
 An issue encountered in character-level models on this task, however, is that the models are unable to leverage the semantic information of words in order to make better predictions regarding essay quality. The word-level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of certain words over others could represent the quality of an essay. There could be more sophisticated or ``good'' words that the essays with high scores tend to contain, and similarly common or ``bad'' words that are usually associated with low-quality essays. In addition, since all misspelled words are given zero vectors (as they lie outside the vocabulary), this model could easily discriminate essays with a lot of misspelled words, which have an average value near 0, from those containing few misspelled words. 
 
-In the data processing stage, the pretrained GLoVe word vectors are utilized to embed all the word in an essay to a fixed length, and these embeddings are then averaged to get the ``average word vector'' of an essay. These fixed dimension ``average word vectors'' are then fed into a fully-connected deep neural network model with 5 hidden layers and rectifier linear unit (ReLU) activation. We consider two different types of output layers, corresponding to different problem formulations. Treating scores as a classification problem, we employ a softmax layer for the output, using 61 units representing all the possible scores ranging from 0 to 60. On the other hand, we can treat scores as a regression problem, for which the output layer is one single unit with linear activation for prediction of a real number value (also known as a multilayer perceptron (MLP) model).
+In the data processing stage, the pretrained GLoVe word vectors are utilized to embed all the word in an essay to a fixed length, and these embeddings are then averaged to get the ``average word vector'' of an essay. These fixed dimension ``average word vectors'' are then fed into a fully-connected deep neural network model with 5 hidden layers and rectifier linear unit (ReLU) activation. We consider two different types of output layers, corresponding to different problem formulations. Treating scores as a classification problem, we employ a softmax layer for the output, using 61 units representing all the possible scores ranging from 0 to 60. On the other hand, we can treat scores as a regression problem, for which the output layer is one single unit with linear activation for prediction of a real number value (also known as a multilayer perceptron (MLP) model). The architecture is shown in Figure \ref{fig:dnn}.
 
 {\em Training.} In the training stage, we used either categorical cross-entropy (for classification) or squared-error (for regression) as our loss criteria. Training naively yielded two over-fitted models for DNN classification and MLP. Then, the models were regularized by introducing elastic net regularization and dropout at each layer. The best-performing model was obtained by using the ``checkpoint'' functionality in Keras package to record the best performance over validation set, essentially using a form of early stopping.
 
 A limitation of these models is that they only consider the wording of an essay without taking the ordering of words, sentence structures, and essay length into consideration. In fact, an essay with proper wording and perfect sentence structure will be embedded exactly same as an essay with the same words but completely disordered sentence structure. 
 
-\subsection*{Sentence-Level LSTM and Pairwise Ranking Model}
+\begin{figure}
+	\includegraphics[width=0.6\textwidth]{dnn.png}
+	\caption{Architecture of ``average-word'' fully-connected deep NN.}
+	\label{fig:dnn}
+\end{figure}
+
+\subsection*{Sentence-Level LSTM and Pairwise Ranking Model}\hfill\\
+\vskip -0.1in
 
 To rectify the above problem, we also consider sentence-level models for essay grading. Suppose each sentence is encoded into a vector of fixed dimension; then the essay can be seen as a series of sentence vectors. Hence it is natural to use an LSTM model to capture sentence-level transition patterns in each essay and measure the quality of essays by assessing such patterns. There are two ways to encode a sentence into a vector:
 \begin{enumerate}
@@ -148,13 +157,18 @@ Another issue is the number of essay pairs used in training. Note that the train
 	\label{fig:rankmodel}
 \end{figure}
 
-\subsection*{Passage-Level Bidirectional LSTM Model}
+\subsection*{Passage-Level Bidirectional LSTM Model}\hfill\\
+\vskip -0.1in
 
-Finally, we consider a passage-level model that is designed to take into account as much information regarding the structure of an essay as possible. The wording, ordering of words, sentence structure, sentence length and essay length are all encoded naturally in this model. The model is constructed in the following fashion.
+Finally, we consider a passage-level model that is designed to take into account as much information regarding the structure of an essay as possible. The wording, ordering of words, sentence structure, sentence length and essay length are all encoded naturally in this model. The model is constructed as follows, with the architecture depicted in Figure \ref{fig:bilstm}.
 
 For each essay, all sentences is padded with START and END tokens. All of the words, including START and END, are encoded as an integer index, and misspelled words or words with low frequency are denoted as 0. All essays are padded into fixed length sequence of integer indices. Short essays are padded with 0 and long essays are truncated from the end. The sequences of indices representing each essay are transformed into sequences of vectors using pretrained GloVe embedding with dimension of 300. These sequences of word embeddings are then fed into a bidirectional LSTM model, which yields passage-level vector representations. The passage-level encoded vectors, i.e. the last outputs of this bidirectional LSTM model, are concatenated together (forward and reverse direction) and fed into the output layer. As with the word-level models, the output layer could either be a softmax with 61 units or one unit with linear activation, for classification and regression respectively.
 
-
+\begin{figure}
+	\includegraphics[width=0.6\textwidth]{bilstm.png}
+	\caption{Architecture of passage-level bidirectional LSTM model using either softmax output for classification or linear output for regression.}
+	\label{fig:bilstm}
+\end{figure}
 
 \section*{Metrics}
 
@@ -195,12 +209,12 @@ Our results are presented in Table \ref{fig:eval}, with the hyperparameter and a
 
 Another result to note not properly reflected in the tables is that our models were often able to distinguish between the different essay prompts with no explicit guidance. In other words, the models automatically classified or predicted scores that fell into the proper score range for each test essay without needed other information regarding the essay set. As such information was provided explicitly to previous models, this demonstrates the learning capacity of deep architectures to both perform well on this task as well as to generalize information across prompts.
 
-Finally, we find that different architectures provide different strengths in terms of final performance on the test set. For example, the character-level CNN models were able to perform quite well on classification and nDCG, but generally failed to perform as well on the quadratic kappa metric or MSE. This indicates that character-level CNN models obtain good predictions for many essays, but on incorrect predictions fail to get scores that are close to the actual scores. On the other hand, models that captured sequential information such as the sentence- or passage-level LSTMs performed very well on the MSE and quadratic kappa metrics, indicating that even when these models failed at predicting precisely the right score, they often were able to predict scores that were close to the actual ones. These results suggest that depending on the preferences of the assessor, different models for essay grading may be more suitable.
+Finally, we find that different architectures provide different strengths in terms of final performance on the test set. For example, the character-level CNN models were able to perform quite well on classification accuracy and RMSE, but generally failed to perform as well on the quadratic kappa or nDCG metrics. This indicates that character-level CNN models obtain good predictions for many essays, but that on similarly-scored essays may fail to resolve these scores into the proper ranking. On the other hand, models that captured sequential information such as the sentence- or passage-level LSTMs performed very well on the nDCG and quadratic kappa metrics, indicating that even when these models failed at predicting precisely the right score, they often were able to predict scores that were close to the actual ones and ranked essays properly. These results suggest that depending on the preferences of the assessor, different models for essay grading may be more suitable.
 
 
 \begin{table}
 	\begin{tabular}{c|c|c|c}
-		Model & Accuracy & MSE & nDCG  \\\hline
+		Model & Accuracy & MSE & nDCG & Quad. Kappa \\\hline
 		Char-level CNN (1-layer, one-hot) & 68.3\% & 0.782 & 0.923 \\
 		Char-level CNN (1-layer, embed) & 66.7\% & 1.158& 0.910\\
 		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 \\
@@ -239,16 +253,14 @@ Finally, we find that different architectures provide different strengths in ter
 
 \subsection*{Won Lee}
 
-Prior to the switch in our project from music-to-lyric generation to automated essay grading, I conducted all data generation (i.e. cleaning, formatting, compiling music-lyric pairs, etc.) and finalized models and training for training/evaluation on Harvard's clusters. With regard to essay grading, I developed all of the character-level and CNN-based models and conducted exhaustive grid search and training for these models. I also contributed to the evaluation script as well as various data-related auxiliary scripts for loading onto the models. Finally, I did most of the write-up for the current report as well as the proposal.
+Prior to the switch in our project from music-to-lyric generation to automated essay grading, I conducted all data generation (i.e. cleaning, formatting, compiling music-lyric pairs, etc.) and finalized models and training for training/evaluation on Harvard's clusters. With regard to essay grading, I developed all of the character-level and CNN-based models and conducted exhaustive grid search and training for these models for both classification and regression tasks. I also contributed to the evaluation script (MSE, accuracy, etc.) as well as various data-related auxiliary scripts for loading onto the models. Finally, I did most of the write-up for the current report as well as the proposal, and standardized output/formatting for the scripts and informative files.
 
 \subsection*{Qin Lyu}
 
 Prior to the switch, I designed the NN-based model and intensively explored its ability for music-lyric generation. With regard to essay grading, I developed all of the sentence-level LSTM models, and proposed to use the pairwise ranking loss to model the order information, and also proposed to use NDCG as an alternative measure of grading quality. I also contributed to the evaluation script (NDCG part) as well as data preprocessing script.
 
 \subsection*{Zelong Qiu}
-During the first stage before switch to current project, I wrote the script of pre-processing data and concatenting music and lyric into batches of pairs. I also built and tested a baseline model using similiarity search. After switch to automatic essay grading, I did the following four parts: 1) wrote the script of prcoessing raw data into rational table and spliting the train/validate/test for model builting. 2) Wrote the of evaluate.py using quadrativ averaged kappa and contribute the same metric for eval.py. 3) Developed and tested all of the word-level DNN models(classification/regression), as well as the passage-level Bi-LSTM models(classfification/regression). 4) Contributed to the corresponding parts in the final report. Designed the layout of presentation poster and completed corresponding parts of it.
-
-With regard to essay grading, I developed all of the sentence-level LSTM models, and proposed to use the pairwise ranking loss to model the order information, and also proposed to use NDCG as an alternative measure of grading quality. I also contributed to the evaluation script (NDCG part) as well as data preprocessing script.
+During the first stage before switch to current project, I wrote the script of pre-processing data and concatenating music and lyric into batches of pairs. I also built and tested a baseline model using similarity search. After switch to automatic essay grading, I did the following four parts: 1) wrote the script of processing raw data into rational table and splitting the train/validate/test for model building; 2) wrote the of evaluation script for quadratic averaged kappa; 3) developed and tested the word-level DNN models (classification/regression), as well as the passage-level bi-LSTM models (classfification/regression). 4) contributed to the corresponding parts in the final report. Designed the layout of presentation poster and completed corresponding parts of it.
 
 \begin{thebibliography}{99}
 \bibitem{iea}
