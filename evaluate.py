@@ -119,23 +119,6 @@ def histogram(ratings, min_rating=None, max_rating=None):
 
 
 def quadratic_weighted_kappa(rater_a, rater_b, min_rating=None, max_rating=None):
-    """
-    Calculates the quadratic weighted kappa
-    quadratic_weighted_kappa calculates the quadratic weighted kappa
-    value, which is a measure of inter-rater agreement between two raters
-    that provide discrete numeric ratings.  Potential values range from -1
-    (representing complete disagreement) to 1 (representing complete
-    agreement).  A kappa value of 0 is expected if all agreement is due to
-    chance.
-    quadratic_weighted_kappa(rater_a, rater_b), where rater_a and rater_b
-    each correspond to a list of integer ratings.  These lists must have the
-    same length.
-    The ratings should be integers, and it is assumed that they contain
-    the complete range of possible ratings.
-    quadratic_weighted_kappa(X, min_rating, max_rating), where min_rating
-    is the minimum possible rating, and max_rating is the maximum possible
-    rating
-    """
     rater_a = np.array(rater_a, dtype=int)
     rater_b = np.array(rater_b, dtype=int)
     assert (len(rater_a) == len(rater_b))
@@ -165,6 +148,3 @@ def quadratic_weighted_kappa(rater_a, rater_b, min_rating=None, max_rating=None)
     return 1.0 - numerator / denominator
 
 
-if __name__ == "__main__":
-    p = read_label(0)
-    evaluate(p, against=0)
