@@ -4,4 +4,4 @@
 gensim
 *.aux
 *.log
-*.synctex
+*.synctex.gz

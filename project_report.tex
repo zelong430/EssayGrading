@@ -174,20 +174,23 @@ For each essay, all sentences is padded with START and END tokens. All of the wo
 
 For the purposes of investigating the respective strengths of the various models considered above, we also consider a number of different evaluation metrics, which highlight different performance properties. We note that these are {\em not} the metrics used during training, but rather metrics used to evaluate the performance of the models on the test set. For all formulas, we let $p_i$ to be the predicted score on the essay $i$ and $y_i$ to be the actual score, with a total test size of $N$.
 
-\subsection*{Classification Accuracy}
+\subsection*{Classification Accuracy}\hfill\\
+\vskip -0.1in
 
 As the essay grading problem is often treated as a classification problem (each discrete score being a ``category'' of essays), we consider evaluating on the simplest classification metric, namely that of accuracy on the test set:
 $$ACC \equiv \frac{1}{N} \sum_{i=1}^N \mathbb{I}_{p_i = y_i}$$
 where $\mathbb{I}_{x=y}$ is an indicator of whether $x=y$.
 
-\subsection*{Mean-Squared Error (MSE)}
+\subsection*{Mean-Squared Error (MSE)}\hfill\\
+\vskip -0.1in
 
 One issue with a raw classification accuracy metric is that it does not provide any indication of the discrepancy between the actual and predicted scores. For example, on a scale of 2-12, a model predicting a score of 3 would incur the same loss as a model predicting 9 for an actual score of 10. We would clearly prefer the latter model over the former model, however; indeed, for grading purposes, it is not as important to achieve the exact same score so much as it is to obtain predictions that are on average close to the actual scores.
 
 Thus, we consider the traditional mean-squared error (MSE) as one of our metrics, namely:
 $$MSE \equiv \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
 
-\subsection*{Normalized Discounted Cumulative Gain (NDCG)}
+\subsection*{Normalized Discounted Cumulative Gain (NDCG)}\hfill\\
+\vskip -0.1in
 
 In addition to the classification accuracy and MSE, we also report NDCG to measure the ranking quality of a model. In our problem, each essay has a discrete score that can be compared with the scores of other essays in the same essay set, while scores of essays from different essay sets are not comparable since the score range of essay sets are different. For each essay set, we compute the Discounted Cumulative Gain (DCG):
  
@@ -199,23 +202,22 @@ In our problem, essay sets contain different number of essays, hence comparing a
 $$NDCG=\frac{DCG}{IDCG}$$
 where IDCG(Ideal DCG) is the maximum possible DCG obtained by sorting all essays in the set by their scores and then calculating the DCG.
 
-\subsection*{Quadratic Averaged Kappa}
-Another metric we considered is Quadratic Averaged Kappa, which measured the degree of agreement between two raters and weighted over the distance between different categories. For example, a score of 5 will gain more penalty if it is predicted as 8 than it is predicted as 6. The range of Quadratic Averaged Kappa is from -1 to 1, and 1 implies perfect agreement while 0 implies a random guess. 
+\subsection*{Quadratic Averaged Kappa}\hfill\\
+\vskip -0.1in
 
-To calculate the Quadratic Averaged Kappa, one need to construct two N by N matrix $O$ and $E$, where N is the number of different grades. $O_{i,j}$ corresponds to the number of essays that received a rating i by Rater A and a rating j by Rater B. Therefore, the summation of $O$ across all i and j should be the total number of essay. For the matrix $E$, we first obtain two length-N vector $u$, $v$, where $u_i$ and $v_i$ represent the number of essay receiving a rating i from rater A and rater B respectively. The matrix $E$ is then the outer-product of vector $u$ and $v$, such that $O_{i,j} = u_i v_j$. Then the matrix $E$ is normalized so that it has same sum as the matrix $O$.
+Another metric we considered is Quadratic Averaged Kappa, which measures the degree of agreement between two raters and weights over the distance between different categories. For example, for an essay with a score of 5, the model will be penalized more heavily by this metric if it predicts 8 than if it is predicts 6. The range of Quadratic Averaged Kappa is from -1 to 1, where 1 implies perfect agreement while 0 implies a random guess. 
 
-Another weight matrix $W$ is calcaluated as following:
+To calculate the Quadratic Averaged Kappa, one needs to construct two $N \times N$ matrices $O$ and $E$, where $N$ is the number of different grades. $O_{i,j}$ corresponds to the number of essays that received a rating $i$ by rater A and a rating $j$ by rater B. Therefore, the summation of $O$ across all $i$ and $j$ should be the total number of essays. For the matrix $E$, we first obtain two length-$N$ vectors $u$, $v$, where $u_i$ and $v_i$ represent the number of essay receiving a rating $i$ from rater A and rater B respectively. The matrix $E$ is then the outer-product of vectors $u$ and $v$, such that $O_{i,j} = u_i v_j$. Afterward, the matrix $E$ is normalized so that it has same sum as the matrix $O$.
+
+Another weight matrix $W$ is calculated as the following:
 $$
 W_{i,j} = \frac{(1-j)^2}{(N-1)^2}
 $$
 
-Finally the Quadratic Averaged Kappa is calculated:
+Finally the Quadratic Averaged Kappa is calculated as:
 $$
 k = 1 - \frac{\sum_{i,j}w_{i,j}O_{i,j}}{\sum_{i,j}w_{i,j}E_{i,j}}
 $$
-
-
-
 
 \section*{Results and Discussion}
 
@@ -233,7 +235,7 @@ Finally, we find that different architectures provide different strengths in ter
 		Char-level CNN (1-layer, embed) & 66.7\% & 1.158& 0.910\\
 		Char-level CNN (6-layer, one-hot) & 38.9\% & 1.039 & 0.929 \\
 		Char-level CNN (6-layer, embed) & 36.7\%& 1.179 & 0.910 \\
-		Word-level DNN Classification (5-layer,GloVe embed) & & &  \\
+		Word-level DNN Classification (5-layer, GloVe embed) & & &  \\
 		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
 		Sentence-level LSTM & -- & -- & 0.9482 \\
 		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
@@ -252,11 +254,11 @@ Finally, we find that different architectures provide different strengths in ter
 		Char-level CNN (1-layer, embed) &  30 & 64 & 128 & 64 & 32 \\
 		Char-level CNN (6-layer, one-hot) & -- & $(64, 32, 16, 8, 4, 2)$ & 64 & $(4,4,4)$ & 64 \\
 		Char-level CNN (6-layer, embed) & 30 & $(64, 64, 32, 16, 4, 4)$ & 64 & $(6,4,4)$ & 128 \\
-		Word-level MLP  & & & & & \\
-		Word-level LSTM  & & & & & \\
-		Word-level Bi-LSTM  & & & & & \\
-		Ranking Model & & & & & \\
-		...  & & & & &
+		Word-level DNN Classification (5-layer, GloVe embed) & & &  \\
+		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
+		Sentence-level LSTM & -- & -- & 0.9482 \\
+		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
+		Passage-level Bi-directional LSTM Regression (GloVe embed) & & & & &
 	\end{tabular}
 	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
 	\label{fig:params}
@@ -274,7 +276,7 @@ Prior to the switch in our project from music-to-lyric generation to automated e
 Prior to the switch, I designed the NN-based model and intensively explored its ability for music-lyric generation. With regard to essay grading, I developed all of the sentence-level LSTM models, and proposed to use the pairwise ranking loss to model the order information, and also proposed to use NDCG as an alternative measure of grading quality. I also contributed to the evaluation script (NDCG part) as well as data preprocessing script.
 
 \subsection*{Zelong Qiu}
-During the first stage before switch to current project, I wrote the script of pre-processing data and concatenating music and lyric into batches of pairs. I also built and tested a baseline model using similarity search. After switch to automatic essay grading, I did the following four parts: 1) wrote the script of processing raw data into rational table and splitting the train/validate/test for model building; 2) wrote the of evaluation script for quadratic averaged kappa; 3) developed and tested the word-level DNN models (classification/regression), as well as the passage-level bi-LSTM models (classfification/regression). 4) contributed to the corresponding parts in the final report. Designed the layout of presentation poster and completed corresponding parts of it.
+During the first stage before switch to current project, I wrote the script of pre-processing data and concatenating music and lyric into batches of pairs. I also built and tested a baseline model using similarity search. After switch to automatic essay grading, I did the following four parts: 1) wrote the script of processing raw data into rational table and splitting the train/validate/test for model building; 2) wrote the of evaluation script for quadratic averaged kappa; 3) developed and tested the word-level DNN models (classification/regression), as well as the passage-level bi-LSTM models (classification/regression). 4) contributed to the corresponding parts in the final report. Designed the layout of presentation poster and completed corresponding parts of it.
 
 \begin{thebibliography}{99}
 \bibitem{iea}

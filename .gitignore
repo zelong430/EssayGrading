@@ -5,3 +5,4 @@ gensim
 *.aux
 *.log
 *.synctex.gz
+*.pdf
