@@ -242,27 +242,27 @@ Finally, we find that different architectures provide different strengths in ter
 		Passage-level Bi-directional LSTM Regression(GloVe embed) & & & 
 		
 	\end{tabular}
-	\caption{Performance on test set evaluated via the metrics discussed above.}
+	\caption{Performance on test set evaluated via the metrics discussed above; hyperparameter settings for each model were selected via performance on the validation set.}
 	\label{fig:eval}
 \end{table}
 
 
-\begin{table}
-	\begin{tabular}{c|c|c|c|c|c}
-		Model & Embed Dim. & Filter Sizes & Num. Filters & Pooling & Hidden Dim. \\\hline
-		Char-level CNN (1-layer, one-hot) & -- & 64 & 64 & 64 & 32 \\
-		Char-level CNN (1-layer, embed) &  30 & 64 & 128 & 64 & 32 \\
-		Char-level CNN (6-layer, one-hot) & -- & $(64, 32, 16, 8, 4, 2)$ & 64 & $(4,4,4)$ & 64 \\
-		Char-level CNN (6-layer, embed) & 30 & $(64, 64, 32, 16, 4, 4)$ & 64 & $(6,4,4)$ & 128 \\
-		Word-level DNN Classification (5-layer, GloVe embed) & & &  \\
-		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
-		Sentence-level LSTM & -- & -- & 0.9482 \\
-		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
-		Passage-level Bi-directional LSTM Regression (GloVe embed) & & & & &
-	\end{tabular}
-	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
-	\label{fig:params}
-\end{table}
+%\begin{table}
+%	\begin{tabular}{c|c|c|c|c|c}
+%		Model & Embed Dim. & Filter Sizes & Num. Filters & Pooling & Hidden Dim. \\\hline
+%		Char-level CNN (1-layer, one-hot) & -- & 64 & 64 & 64 & 32 \\
+%		Char-level CNN (1-layer, embed) &  30 & 64 & 128 & 64 & 32 \\
+%		Char-level CNN (6-layer, one-hot) & -- & $(64, 32, 16, 8, 4, 2)$ & 64 & $(4,4,4)$ & 64 \\
+%		Char-level CNN (6-layer, embed) & 30 & $(64, 64, 32, 16, 4, 4)$ & 64 & $(6,4,4)$ & 128 \\
+%		Word-level DNN Classification (5-layer, GloVe embed) & & &  \\
+%		Word-level DNN Regression(5-layer, GloVe embed) & & &  \\
+%		Sentence-level LSTM & -- & -- & 0.9482 \\
+%		Passage-level Bi-directional LSTM Classification (GloVe embed) & & &  \\
+%		Passage-level Bi-directional LSTM Regression (GloVe embed) & & & & &
+%	\end{tabular}
+%	\caption{Hyperparameter and architectural choices as selected by performance on validation. Hyperparameter settings that are irrelevant for certain models are omitted (--).}
+%	\label{fig:params}
+%\end{table}
 
 
 \section*{Member Contributions}
