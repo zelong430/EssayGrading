@@ -106,13 +106,15 @@ A prominent issue with essay grading is that many of the words in candidate essa
 
 One way to deal with such cases is to consider character-level models rather than word-level models. Thus, we consider a character-level convolutional neural network (CNN), which embeds each character into a $d$-dimensional vector ($d \approx 30$) and employs a series of 1D convolutions and max-pooling layers to extract efficient representations for inference. We stack fully-connected layers on top of the convolutional layers for final processing, and use either dense or one-hot encodings of the characters as input. We provide a schematic of our overall architecture in Figure \ref{fig:cnn}. We consider a 6 convolutional layer model inspired by the work of Zhang, Zhao, and LeCun, 2015 \cite{charnn} as well as a 1 convolutional layer model inspired by the work of Kim, 2014 \cite{kim14} using multiple kernels and filter sizes.
 
-\begin{figure}
-	\includegraphics[width=\textwidth]{cnn.png}
+{\em Training.} In this formulation, we primarily treated the essay score as a percentage of the score range (i.e. for essay set 1, which has range 2-12, an essay with score 6 would be treated as 0.4), and used logistic regression as our final output. We used standard stochastic gradient descent (SGD) with momentum for training, using binary cross-entropy loss as our objective.
+
+\begin{figure}[h!]
+	\includegraphics[width=0.7\textwidth]{cnn.png}
 	\caption{Architecture of character-level CNN model; figure credit to Zhang, X., J. Zhao, and Y. LeCun (2015).}
 	\label{fig:cnn}
 \end{figure}
 
-{\em Training.} In this formulation, we primarily treated the essay score as a percentage of the score range (i.e. for essay set 1, which has range 2-12, an essay with score 6 would be treated as 0.4), and used logistic regression as our final output. We used standard stochastic gradient descent (SGD) with momentum for training, using binary cross-entropy loss as our objective.
+\newpage
 
 \subsection*{Word-Level Deep Neural Network}\hfill\\
 \vskip -0.1in
@@ -125,11 +127,13 @@ In the data processing stage, the pretrained GLoVe word vectors are utilized to 
 
 A limitation of these models is that they only consider the wording of an essay without taking the ordering of words, sentence structures, and essay length into consideration. In fact, an essay with proper wording and perfect sentence structure will be embedded exactly same as an essay with the same words but completely disordered sentence structure. 
 
-\begin{figure}
+\begin{figure}[b!]
 	\includegraphics[width=0.6\textwidth]{dnn.png}
 	\caption{Architecture of ``average-word'' fully-connected deep NN.}
 	\label{fig:dnn}
 \end{figure}
+
+\newpage
 
 \subsection*{Sentence-Level LSTM and Pairwise Ranking Model}\hfill\\
 \vskip -0.1in
@@ -149,13 +153,15 @@ where $o_{ij}\equiv o_i-o_j, P_{ij}\equiv 1/(1+e^{-o_{ij}})$, and $y_{ij}$ is th
 
 The model architecture is shown in Figure \ref{fig:rankmodel}. Note that we add one more LSTM layer in the reverse direction to further exploit the transition pattern between sentences in essays.
 
-Another issue is the number of essay pairs used in training. Note that the training set will grow exponentially large if we make all the pairs in each essay set. Since each essay set in our problem contains more than a thousand essays, it is computationally infeasible to use all the essay pairs as training data. To preserve the order information in original dataset as much as possible, we sort the essays in each essay set by their scores, and pair the top $K$ essays with all of the other essays in the same essay set. In other words, we keep most of the information for determining what is a good essay, and no essay is discarded. Note that this also reduces the number of essay pairs in which the two essays have similar scores, which is a potential way to reduce noise as all essays were graded by human and it is hazardous to determine the order of essays with similar scores.
-
-\begin{figure}
+\begin{figure}[h!]
 	\includegraphics[width=0.6\textwidth]{rankmodel.jpg}
 	\caption{Architecture of sentence-level LSTM model with pairwise ranking loss. Note that the weights of the two LSTM models are shared.}
 	\label{fig:rankmodel}
 \end{figure}
+
+Another issue is the number of essay pairs used in training. Note that the training set will grow exponentially large if we make all the pairs in each essay set. Since each essay set in our problem contains more than a thousand essays, it is computationally infeasible to use all the essay pairs as training data. To preserve the order information in original dataset as much as possible, we sort the essays in each essay set by their scores, and pair the top $K$ essays with all of the other essays in the same essay set. In other words, we keep most of the information for determining what is a good essay, and no essay is discarded. Note that this also reduces the number of essay pairs in which the two essays have similar scores, which is a potential way to reduce noise as all essays were graded by human and it is hazardous to determine the order of essays with similar scores.
+
+
 
 \subsection*{Passage-Level Bidirectional LSTM Model}\hfill\\
 \vskip -0.1in
@@ -164,7 +170,7 @@ Finally, we consider a passage-level model that is designed to take into account
 
 For each essay, all sentences is padded with START and END tokens. All of the words, including START and END, are encoded as an integer index, and misspelled words or words with low frequency are denoted as 0. All essays are padded into fixed length sequence of integer indices. Short essays are padded with 0 and long essays are truncated from the end. The sequences of indices representing each essay are transformed into sequences of vectors using pretrained GloVe embedding with dimension of 300. These sequences of word embeddings are then fed into a bidirectional LSTM model, which yields passage-level vector representations. The passage-level encoded vectors, i.e. the last outputs of this bidirectional LSTM model, are concatenated together (forward and reverse direction) and fed into the output layer. As with the word-level models, the output layer could either be a softmax with 61 units or one unit with linear activation, for classification and regression respectively.
 
-\begin{figure}
+\begin{figure}[h!]
 	\includegraphics[width=0.6\textwidth]{bilstm.png}
 	\caption{Architecture of passage-level bidirectional LSTM model using either softmax output for classification or linear output for regression.}
 	\label{fig:bilstm}
@@ -173,6 +179,8 @@ For each essay, all sentences is padded with START and END tokens. All of the wo
 \section*{Metrics}
 
 For the purposes of investigating the respective strengths of the various models considered above, we also consider a number of different evaluation metrics, which highlight different performance properties. We note that these are {\em not} the metrics used during training, but rather metrics used to evaluate the performance of the models on the test set. For all formulas, we let $p_i$ to be the predicted score on the essay $i$ and $y_i$ to be the actual score, with a total test size of $N$.
+
+\newpage
 
 \subsection*{Classification Accuracy}\hfill\\
 \vskip -0.1in
@@ -228,7 +236,7 @@ Another result to note not properly reflected in the tables is that our models w
 Finally, we find that different architectures provide different strengths in terms of final performance on the test set. For example, the character-level CNN models were able to perform quite well on classification accuracy and RMSE, but generally failed to perform as well on the quadratic kappa or nDCG metrics. This indicates that character-level CNN models obtain good predictions for many essays, but that on similarly-scored essays may fail to resolve these scores into the proper ranking. On the other hand, models that captured sequential information such as the sentence- or passage-level LSTMs performed very well on the nDCG and quadratic kappa metrics, indicating that even when these models failed at predicting precisely the right score, they often were able to predict scores that were close to the actual ones and ranked essays properly. These results suggest that depending on the preferences of the assessor, different models for essay grading may be more suitable.
 
 
-\begin{table}
+\begin{table}[h!]
 	\begin{tabular}{c|c|c|c|c}
 		Model & Accuracy & MSE & nDCG & Quad. Kappa \\\hline
 		Char-level CNN (1-layer, one-hot) & 68.3\% & {\bf 0.782} & 0.923 & 0.936 \\
@@ -264,6 +272,7 @@ Finally, we find that different architectures provide different strengths in ter
 %	\label{fig:params}
 %\end{table}
 
+\newpage
 
 \section*{Member Contributions}
 
