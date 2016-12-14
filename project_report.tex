@@ -102,9 +102,9 @@ The dataset contains both the essay set ID and essay ID, as well as the entire t
 \subsection*{Character-Level CNN}\hfill\\
 \vskip -0.1in
 
-A prominent issue with essay grading is that many of the words in candidate essays are misspelled, so that they lie outside a fixed vocabulary. Most models with fixed vocabulary word embeddings can only deal with such words by treating them as ``UNK'' tokens, which removes any information that such words may convey about the quality of the essay. Unlike most natural language tasks for which out-of-vocabulary words are infrequent and often unimportant, misspellings can provide valuable information regarding the quality of the writing for grading student essays.
+A prominent issue with essay grading is that many of the words in candidate essays are misspelled, so that they lie outside a fixed vocabulary. Most models with fixed vocabulary that incorporate word embeddings can only deal with such words by treating them as ``UNK'' tokens, which removes any information that such words may convey about the quality of the essay. Unlike most natural language tasks for which out-of-vocabulary words are infrequent and often unimportant, misspellings can provide valuable information regarding the quality of the writing for grading student essays. Thus, it becomes of interest to consider models that can naturally deal with such misspelled words while also extracting information from them regarding essay quality and assessing the ability of the writer that constructs such essays.
 
-One way to deal with such cases is to consider character-level models rather than word-level models. Thus, we consider a character-level convolutional neural network (CNN), which embeds each character into a $d$-dimensional vector ($d \approx 30$) and employs a series of 1D convolutions and max-pooling layers to extract efficient representations for inference. We stack fully-connected layers on top of the convolutional layers for final processing, and use either dense or one-hot encodings of the characters as input. We provide a schematic of our overall architecture in Figure \ref{fig:cnn}. We consider a 6 convolutional layer model inspired by the work of Zhang, Zhao, and LeCun, 2015 \cite{charnn} as well as a 1 convolutional layer model inspired by the work of Kim, 2014 \cite{kim14} using multiple kernels and filter sizes.
+One way to deal with such cases is to consider character-level models rather than word-level models. Thus, we consider a character-level convolutional neural network (CNN), which embeds each character into a $d$-dimensional vector ($d \approx 30$) and employs a series of 1D convolutions and max-pooling layers to extract efficient representations for inference. We stack fully-connected layers on top of the convolutional layers for final processing, and use either dense or one-hot encodings of the characters as input. We provide a schematic of our overall architecture in Figure \ref{fig:cnn}. We consider a 6 convolutional layer model inspired by the work of Zhang, Zhao, and LeCun, 2015 \cite{lecun} as well as a 1 convolutional layer model inspired by the work of Kim, 2014 \cite{kim14} using multiple kernels and filter sizes.
 
 {\em Training.} In this formulation, we primarily treated the essay score as a percentage of the score range (i.e. for essay set 1, which has range 2-12, an essay with score 6 would be treated as 0.4), and used logistic regression as our final output. We used standard stochastic gradient descent (SGD) with momentum for training, using binary cross-entropy loss as our objective.
 
@@ -119,9 +119,9 @@ One way to deal with such cases is to consider character-level models rather tha
 \subsection*{Word-Level Deep Neural Network}\hfill\\
 \vskip -0.1in
 
-An issue encountered in character-level models on this task, however, is that the models are unable to leverage the semantic information of words in order to make better predictions regarding essay quality. The word-level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of certain words over others could represent the quality of an essay. There could be more sophisticated or ``good'' words that the essays with high scores tend to contain, and similarly common or ``bad'' words that are usually associated with low-quality essays. In addition, since all misspelled words are given zero vectors (as they lie outside the vocabulary), this model could easily discriminate essays with a lot of misspelled words, which have an average value near 0, from those containing few misspelled words. 
+An issue encountered in character-level models on this task, however, is that the models are unable to leverage the semantic information of words in order to make better predictions regarding essay quality. The word-level DNN model was built to model each essay as an ``averaged word''. The logic behind this idea is that the usage of certain words over others could represent the quality of an essay. There could be more sophisticated or ``good'' words that the essays with high scores tend to contain, and similarly common or ``bad'' words that are usually associated with low-quality essays. In addition, since all misspelled words are given zero vectors (as they lie outside the vocabulary), this model could easily discriminate essays with a lot of misspelled words, which have an average value near 0, from those containing few misspelled words. On the other hand, it cannot discriminate between wrong words (i.e. gross versus minor misspellings), which can affect the performance of the model as well.
 
-In the data processing stage, the pretrained GLoVe word vectors are utilized to embed all the word in an essay to a fixed length, and these embeddings are then averaged to get the ``average word vector'' of an essay. These fixed dimension ``average word vectors'' are then fed into a fully-connected deep neural network model with 5 hidden layers and rectifier linear unit (ReLU) activation. We consider two different types of output layers, corresponding to different problem formulations. Treating scores as a classification problem, we employ a softmax layer for the output, using 61 units representing all the possible scores ranging from 0 to 60. On the other hand, we can treat scores as a regression problem, for which the output layer is one single unit with linear activation for prediction of a real number value (also known as a multilayer perceptron (MLP) model). The architecture is shown in Figure \ref{fig:dnn}.
+The architecture of this model is constructed in the following manner. In the data processing stage, the pretrained GLoVe word vectors are utilized to embed all the word in an essay to a fixed length, and these embeddings are then averaged to get the ``average word vector'' of an essay. These fixed dimension ``average word vectors'' are then fed into a fully-connected deep neural network model with 5 hidden layers and rectifier linear unit (ReLU) activation. We consider two different types of output layers, corresponding to different problem formulations. Treating scores as a classification problem, we employ a softmax layer for the output, using 61 units representing all the possible scores ranging from 0 to 60. On the other hand, we can treat scores as a regression problem, for which the output layer is one single unit with linear activation for prediction of a real number value (also known as a multilayer perceptron (MLP) model). The architecture is shown in Figure \ref{fig:dnn}.
 
 {\em Training.} In the training stage, we used either categorical cross-entropy (for classification) or squared-error (for regression) as our loss criteria. Training naively yielded two over-fitted models for DNN classification and MLP. Then, the models were regularized by introducing elastic net regularization and dropout at each layer. The best-performing model was obtained by using the ``checkpoint'' functionality in Keras package to record the best performance over validation set, essentially using a form of early stopping.
 
@@ -178,7 +178,9 @@ For each essay, all sentences is padded with START and END tokens. All of the wo
 
 \section*{Metrics}
 
-For the purposes of investigating the respective strengths of the various models considered above, we also consider a number of different evaluation metrics, which highlight different performance properties. We note that these are {\em not} the metrics used during training, but rather metrics used to evaluate the performance of the models on the test set. For all formulas, we let $p_i$ to be the predicted score on the essay $i$ and $y_i$ to be the actual score, with a total test size of $N$.
+For the purposes of investigating the respective strengths of the various models considered above, we also consider a number of different evaluation metrics, which highlight different performance properties. Certain metrics highlight different aspects of the problem: raw classification accuracy may inform us about the performance of the model in terms of predicting the absolute correct label, but may give little information about how close the model's predictions are to the true value.
+
+We note that these are {\em not} the metrics used during training, but rather metrics used to evaluate the performance of the models on the test set. During training, the appropriate loss function (i.e. cross-entropy for classification, squared error for regression) are used to propagate gradients. For all formulas, we let $p_i$ to be the predicted score on the essay $i$ and $y_i$ to be the actual score, with a total test size of $N$.
 
 \newpage
 
@@ -295,7 +297,7 @@ Foltz, P. W., et al. (2013). ``Implementation and applications of the Intelligen
 Attali, Y. and J. Burstein (2006). ``Automated Essay Scoring with e-Rater V2.'' {\em The Journal of Technology, Learning and Assessment} 4.
 
 \bibitem{collobert}
-Collobert, R.
+Collobert, R., J. Weston, L. Bottou, M. Karlen, K. Kavukcuoglu and P. Kuksa (2011). ``Natural Language Processing (Almost) from Scratch.'' {\em Journal of Machine Learning Research} 12: 2493-2537.
 
 \bibitem{glove}
 Pennington, J., R. Socher, and C. D. Manning (2014).`` GloVe: Global Vectors for Word Representation.;;
@@ -305,6 +307,15 @@ Burges, C., Shaked, T., Renshaw, E., Lazier, A., Deeds, M., Hamilton, N., and Hu
 
 \bibitem{kaggle}
 Kaggle (2012). ``Develop an automated scoring algorithm for student-written essays.'' https://www.kaggle.com/c/asap-aes.
+
+\bibitem{kim14}
+Kim, Y. (2014). ``Convolutional Neural Networks for Sentence Classification.'' {\em Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)}: 1746–1751.
+
+\bibitem{lecun}
+Zhang, X., J. Zhao, and Y. LeCun (2015). ``Character-level Convolutiona; Networks for Text Classification.'' {\em NIPS 2015}.
+
+\bibitem{s2s}
+Sutskever, I., O. Vinyals, and Q. V. Le (2014). ``Sequence to Sequence Learning with Neural Networks.'' {\em NIPS 2014}.
 
 
 \end{thebibliography}
